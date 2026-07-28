@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتيجة الثانوية العامة 2025</title>
+    <meta name="description" content="استعلم عن نتيجة الثانوية العامة برقم الجلوس أو الاسم الثلاثي">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f0f23;
+            --bg-card: #1a1a2e;
+            --bg-card-hover: #22223a;
+            --bg-input: #16162a;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2d2d4a;
+            --glow: rgba(99, 102, 241, 0.3);
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-animation .orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: var(--primary);
+            top: -200px;
+            right: -200px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation .orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #8b5cf6;
+            bottom: -100px;
+            left: -100px;
+            animation-delay: -7s;
+        }
+
+        .bg-animation .orb:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            top: 50%;
+            left: 50%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -50px) scale(1.1); }
+            50% { transform: translate(-20px, 20px) scale(0.9); }
+            75% { transform: translate(50px, 30px) scale(1.05); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+        }
+
+        .header-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            box-shadow: 0 8px 32px var(--glow);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 8px 32px var(--glow); }
+            50% { box-shadow: 0 8px 48px rgba(99, 102, 241, 0.5); }
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px var(--glow);
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .stat-card.passed .stat-value { color: var(--success); }
+        .stat-card.second .stat-value { color: var(--warning); }
+        .stat-card.failed .stat-value { color: var(--danger); }
+        .stat-card.total .stat-value { color: var(--primary-light); }
+
+        /* Search Section */
+        .search-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--bg-input);
+            border-radius: 14px;
+            padding: 4px;
+        }
+
+        .search-tab {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 16px var(--glow);
+        }
+
+        .search-tab:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input-wrapper .icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--glow);
+        }
+
+        .search-input:focus + .icon {
+            color: var(--primary-light);
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--glow);
+        }
+
+        .search-btn:active {
+            transform: translateY(0);
+        }
+
+        .search-btn.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .search-hint {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 12px;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.visible {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-count {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            padding: 0 8px;
+        }
+
+        .results-count span {
+            color: var(--primary-light);
+            font-weight: 700;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            animation: cardIn 0.4s ease backwards;
+        }
+
+        .result-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 24px var(--glow);
+            transform: translateY(-2px);
+        }
+
+        .result-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .student-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .student-seat {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .status-badge.passed {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .status-badge.second-round {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+        }
+
+        .status-badge.failed {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .status-badge.absent {
+            background: rgba(100, 116, 139, 0.15);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            color: #94a3b8;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .result-item {
+            background: var(--bg-input);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .result-item .item-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .result-item .item-value {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .result-item .item-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .result-item.total-score .item-value { color: var(--primary-light); }
+        .result-item.percentage .item-value { color: var(--accent); }
+        .result-item.rank .item-value { color: var(--success); }
+        .result-item.top-percent .item-value { color: #f472b6; }
+
+        /* Error and Empty States */
+        .message-box {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .message-box .msg-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .message-box .msg-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .message-box.error .msg-icon { color: var(--danger); }
+
+        /* Loading spinner */
+        .spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 12px; }
+            .header h1 { font-size: 1.5rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .result-grid { grid-template-columns: repeat(2, 1fr); }
+            .search-section { padding: 20px; border-radius: 18px; }
+            .result-card { padding: 18px; }
+            .student-name { font-size: 1.1rem; }
+            .stat-card .stat-value { font-size: 1.1rem; }
+        }
+
+        @media (max-width: 400px) {
+            .result-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .result-item { padding: 12px 8px; }
+        }
+
+        /* Confetti animation for top students */
+        .result-card.top-student {
+            border: 2px solid var(--accent);
+            background: linear-gradient(135deg, var(--bg-card), rgba(245, 158, 11, 0.05));
+        }
+
+        .result-card.top-student::before {
+            content: '🏆';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            background: var(--bg-card);
+            padding: 0 10px;
+            border-radius: 50%;
+        }
+
+        .result-card {
+            position: relative;
+        }
+
+        /* Progress bar for percentage */
+        .percentage-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 3px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+
+        .percentage-bar .fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+            background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--accent));
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="header-icon">🎓</div>
+            <h1>نتيجة الثانوية العامة</h1>
+            <p>ابحث عن نتيجتك برقم الجلوس أو الاسم الثلاثي</p>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar" id="statsBar">
+            <div class="stat-card total">
+                <div class="stat-value" id="statTotal">---</div>
+                <div class="stat-label">إجمالي الطلاب</div>
+            </div>
+            <div class="stat-card passed">
+                <div class="stat-value" id="statPassed">---</div>
+                <div class="stat-label">ناجح دور أول</div>
+            </div>
+            <div class="stat-card second">
+                <div class="stat-value" id="statSecond">---</div>
+                <div class="stat-label">دور ثاني</div>
+            </div>
+            <div class="stat-card failed">
+                <div class="stat-value" id="statFailed">---</div>
+                <div class="stat-label">راسب</div>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-input-wrapper">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput" 
+                    placeholder="أدخل رقم الجلوس أو الاسم الثلاثي..."
+                    autocomplete="off"
+                >
+                <span class="icon">🔍</span>
+            </div>
+
+            <button class="search-btn" id="searchBtn" onclick="performSearch()">
+                <span id="btnText">بحث عن النتيجة</span>
+            </button>
+
+            <p class="search-hint">ابحث برقم الجلوس أو اكتب الاسم الثلاثي (مثال: محمد أحمد علي)</p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <p class="results-count" id="resultsCount"></p>
+            <div id="resultsContainer"></div>
+        </div>
+
+        <footer class="footer">
+            <p>نتيجة الثانوية العامة - النظام الحديث 2025</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        // Data variables
+        let studentsData = [];
+        let isDataLoaded = false;
+        
+        let stats = {
+            total_students: 0,
+            passed: 0,
+            second_round: 0,
+            failed: 0,
+            absent: 0
+        };
+
+        // Load stats on page load
+        window.addEventListener('DOMContentLoaded', initApp);
+
+        function formatNumber(num) {
+            return num.toLocaleString('ar-EG');
+        }
+
+        // Normalize Arabic text for search matching
+        function normalizeArabic(text) {
+            if (!text) return '';
+            // Remove tashkeel
+            text = text.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, '');
+            // Normalize hamza
+            text = text.replace(/[إأآا]/g, 'ا');
+            text = text.replace(/[ؤ]/g, 'و');
+            text = text.replace(/[ئ]/g, 'ي');
+            // Normalize taa marbuta
+            text = text.replace(/ة/g, 'ه');
+            // Normalize alef maqsura
+            text = text.replace(/ى/g, 'ي');
+            // Clean whitespace
+            text = text.split(/\s+/).join(' ').trim();
+            return text;
+        }
+
+        async function initApp() {
+            const btn = document.getElementById('searchBtn');
+            const btnText = document.getElementById('btnText');
+            
+            btn.classList.add('loading');
+            btnText.innerHTML = '<span class="spinner"></span> جاري تحميل قاعدة البيانات... 0%';
+
+            try {
+                // There are 5 chunks generated
+                const chunks = ['chunk_1.csv', 'chunk_2.csv', 'chunk_3.csv', 'chunk_4.csv', 'chunk_5.csv'];
+                
+                let loadedChunks = 0;
+                
+                for (let chunk of chunks) {
+                    const response = await fetch(chunk);
+                    const csvText = await response.text();
+                    
+                    Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            // Process and add to main array
+                            const parsed = results.data.map(row => {
+                                const caseDesc = row.student_case_desc || '';
+                                
+                                // Update stats
+                                stats.total_students++;
+                                if (caseDesc === 'ناجح دور أول') stats.passed++;
+                                else if (caseDesc === 'دور ثان') stats.second_round++;
+                                else if (caseDesc.includes('راسب')) stats.failed++;
+                                else if (caseDesc.includes('غياب')) stats.absent++;
+
+                                return {
+                                    s: row.seating_no,
+                                    n: row.arabic_name,
+                                    nn: normalizeArabic(row.arabic_name),
+                                    t: parseFloat(row.total_degree),
+                                    c: caseDesc,
+                                    p: parseFloat(row.percentage),
+                                    r: parseInt(row.rank),
+                                    tp: parseFloat(row.top_percent)
+                                };
+                            });
+                            
+                            studentsData = studentsData.concat(parsed);
+                        }
+                    });
+                    
+                    loadedChunks++;
+                    const percent = Math.round((loadedChunks / chunks.length) * 100);
+                    btnText.innerHTML = `<span class="spinner"></span> جاري تحميل قاعدة البيانات... ${percent}%`;
+                }
+
+                isDataLoaded = true;
+                btn.classList.remove('loading');
+                btnText.textContent = 'بحث عن النتيجة';
+                
+                // Update stats UI
+                document.getElementById('statTotal').textContent = formatNumber(stats.total_students);
+                document.getElementById('statPassed').textContent = formatNumber(stats.passed);
+                document.getElementById('statSecond').textContent = formatNumber(stats.second_round);
+                document.getElementById('statFailed').textContent = formatNumber(stats.failed);
+
+            } catch (e) {
+                console.error('Failed to load data:', e);
+                btnText.textContent = '❌ حدث خطأ في التحميل';
+            }
+        }
+
+        // Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        function performSearch() {
+            if (!isDataLoaded) {
+                showMessage('⚠️', 'يرجى الانتظار حتى يكتمل تحميل قاعدة البيانات.', 'error');
+                return;
+            }
+
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            const btn = document.getElementById('searchBtn');
+            const btnText = document.getElementById('btnText');
+            
+            btn.classList.add('loading');
+            btnText.innerHTML = '<span class="spinner"></span> جاري البحث...';
+
+            // Use setTimeout to allow UI to update before heavy search
+            setTimeout(() => {
+                try {
+                    const isDigits = /^\d+$/.test(query);
+                    let results = [];
+
+                    if (isDigits) {
+                        // Search by seat number
+                        const match = studentsData.find(s => s.s === query);
+                        if (match) results = [match];
+                    } else {
+                        // Search by name
+                        const normalized = normalizeArabic(query);
+                        const parts = normalized.split(' ').filter(p => p.length > 0);
+                        
+                        if (parts.length < 2) {
+                            showMessage('⚠️', 'يرجى إدخال اسمين على الأقل', 'error');
+                            btn.classList.remove('loading');
+                            btnText.textContent = 'بحث عن النتيجة';
+                            return;
+                        }
+
+                        const searchPhrase = parts.join(' ');
+                        const searchNoSpace = parts.join('');
+
+                        results = studentsData.filter(s => {
+                            if (!s.nn) return false;
+                            return s.nn.startsWith(searchPhrase) || s.nn.replace(/ /g, '').startsWith(searchNoSpace);
+                        });
+                    }
+
+                    const totalFound = results.length;
+                    // Limit to top 50 results
+                    const limitedResults = results.slice(0, 50).map(r => ({
+                        seating_no: r.s,
+                        name: r.n,
+                        total: r.t,
+                        percentage: r.p,
+                        status: r.c,
+                        rank: r.r,
+                        top_percent: r.tp,
+                        total_students: stats.total_students
+                    }));
+
+                    if (limitedResults.length === 0) {
+                        showMessage('😕', 'لم يتم العثور على نتائج. تأكد من صحة البيانات المُدخلة.', '');
+                    } else {
+                        displayResults(limitedResults, totalFound);
+                    }
+
+                } catch (e) {
+                    showMessage('❌', 'حدث خطأ في البحث.', 'error');
+                } finally {
+                    btn.classList.remove('loading');
+                    btnText.textContent = 'بحث عن النتيجة';
+                }
+            }, 50);
+        }
+
+        function showMessage(icon, text, type) {
+            const section = document.getElementById('resultsSection');
+            const container = document.getElementById('resultsContainer');
+            document.getElementById('resultsCount').textContent = '';
+            
+            container.innerHTML = `
+                <div class="message-box ${type}">
+                    <div class="msg-icon">${icon}</div>
+                    <div class="msg-text">${text}</div>
+                </div>
+            `;
+            section.classList.add('visible');
+        }
+
+        function getStatusBadge(status) {
+            if (status.includes('ناجح')) {
+                return `<span class="status-badge passed">✅ ${status}</span>`;
+            } else if (status.includes('دور ثان')) {
+                return `<span class="status-badge second-round">🔄 ${status}</span>`;
+            } else if (status.includes('راسب')) {
+                return `<span class="status-badge failed">❌ ${status}</span>`;
+            } else if (status.includes('غياب')) {
+                return `<span class="status-badge absent">⚪ ${status}</span>`;
+            }
+            return `<span class="status-badge">${status}</span>`;
+        }
+
+        function displayResults(results, total) {
+            const section = document.getElementById('resultsSection');
+            const container = document.getElementById('resultsContainer');
+            const countEl = document.getElementById('resultsCount');
+
+            if (total > results.length) {
+                countEl.innerHTML = `تم العثور على <span>${formatNumber(total)}</span> نتيجة — عرض أول <span>${results.length}</span>`;
+            } else {
+                countEl.innerHTML = `تم العثور على <span>${formatNumber(results.length)}</span> نتيجة`;
+            }
+
+            container.innerHTML = results.map((r, i) => {
+                const isTop = r.percentage >= 95;
+                const topClass = isTop ? 'top-student' : '';
+                
+                return `
+                <div class="result-card ${topClass}" style="animation-delay: ${i * 0.1}s">
+                    <div class="result-card-header">
+                        <div>
+                            <div class="student-name">${r.name}</div>
+                            <div class="student-seat">🎫 رقم الجلوس: ${r.seating_no}</div>
+                        </div>
+                        ${getStatusBadge(r.status)}
+                    </div>
+
+                    <div class="result-grid">
+                        <div class="result-item total-score">
+                            <div class="item-icon">📊</div>
+                            <div class="item-value">${r.total}</div>
+                            <div class="item-label">المجموع من 320</div>
+                        </div>
+                        <div class="result-item percentage">
+                            <div class="item-icon">📈</div>
+                            <div class="item-value">${r.percentage}%</div>
+                            <div class="item-label">النسبة المئوية</div>
+                        </div>
+                        <div class="result-item rank">
+                            <div class="item-icon">🏅</div>
+                            <div class="item-value">${formatNumber(r.rank)}</div>
+                            <div class="item-label">الترتيب من ${formatNumber(r.total_students)}</div>
+                        </div>
+                        <div class="result-item top-percent">
+                            <div class="item-icon">🔝</div>
+                            <div class="item-value">${r.top_percent}%</div>
+                            <div class="item-label">من أعلى كام في المية</div>
+                        </div>
+                    </div>
+
+                    <div class="percentage-bar">
+                        <div class="fill" style="width: ${Math.min(r.percentage, 100)}%"></div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            section.classList.add('visible');
+
+            // Smooth scroll to results
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+</html>
+
