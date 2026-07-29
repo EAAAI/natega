@@ -3,8 +3,9 @@ import pandas as pd
 import numpy as np
 import re
 import os
+import time
 
-app = Flask(__name__, static_folder='.')
+app = Flask(__name__, static_folder='.', static_url_path='')
 
 # Arabic text normalization for better search
 def normalize_arabic(text):
@@ -27,31 +28,40 @@ def normalize_arabic(text):
     return text
 
 
-# Load data once into memory for fast search
+# Load data once into memory for fast search (Optional, since frontend does it client-side)
 print("⏳ جاري تحميل البيانات...")
 DATA_PATH = os.path.join(os.path.dirname(__file__), 'results.csv')
-df = pd.read_csv(DATA_PATH)
-df['seating_no'] = df['seating_no'].astype(str)
-df['arabic_name'] = df['arabic_name'].astype(str)
-df['total_degree'] = df['total_degree'].astype(float)
-df['percentage'] = df['percentage'].astype(float)
-df['top_percent'] = df['top_percent'].astype(float)
-df['rank'] = df['rank'].astype(int)
-TOTAL_STUDENTS = len(df)
-
-# Pre-compute normalized names for fast search
-print("⏳ جاري تجهيز فهرس البحث بالاسم...")
-df['name_normalized'] = df['arabic_name'].apply(normalize_arabic)
-
-# Build a lookup dict for seat numbers (instant O(1) lookup)
 seat_lookup = {}
-for idx, row in df.iterrows():
-    seat_lookup[row['seating_no']] = idx
+TOTAL_STUDENTS = 0
+names_array = []
 
-print(f"✅ تم تحميل {TOTAL_STUDENTS:,} طالب بنجاح!")
+try:
+    if os.path.exists(DATA_PATH):
+        df = pd.read_csv(DATA_PATH)
+        df['seating_no'] = df['seating_no'].astype(str)
+        df['arabic_name'] = df['arabic_name'].astype(str)
+        df['total_degree'] = df['total_degree'].astype(float)
+        df['percentage'] = df['percentage'].astype(float)
+        df['top_percent'] = df['top_percent'].astype(float)
+        df['rank'] = df['rank'].astype(int)
+        TOTAL_STUDENTS = len(df)
 
-# Convert name_normalized to numpy array for faster search
-names_array = df['name_normalized'].values
+        # Pre-compute normalized names for fast search
+        print("⏳ جاري تجهيز فهرس البحث بالاسم...")
+        df['name_normalized'] = df['arabic_name'].apply(normalize_arabic)
+
+        # Build a lookup dict for seat numbers (instant O(1) lookup)
+        for idx, row in df.iterrows():
+            seat_lookup[row['seating_no']] = idx
+
+        print(f"✅ تم تحميل {TOTAL_STUDENTS:,} طالب بنجاح من results.csv!")
+
+        # Convert name_normalized to numpy array for faster search
+        names_array = df['name_normalized'].values
+    else:
+        print("⚠️ ملف results.csv غير موجود، سيعمل السيرفر كخادم للملفات فقط ولن تعمل API البحث الخلفية.")
+except Exception as e:
+    print(f"⚠️ خطأ أثناء تحميل results.csv: {e}")
 
 
 @app.route('/')
@@ -141,6 +151,28 @@ def stats():
         'average': round(float(df[df['student_case_desc'] == 'ناجح دور أول']['total_degree'].mean()), 2)
     })
 
+active_sessions = {}
+
+@app.route('/api/heartbeat', methods=['POST'])
+def heartbeat():
+    data = request.get_json(silent=True) or {}
+    session_id = data.get('session_id')
+    if not session_id:
+        session_id = request.remote_addr
+    active_sessions[session_id] = time.time()
+    return jsonify({"status": "ok"})
+
+@app.route('/api/live_count', methods=['GET'])
+def get_live_count():
+    current_time = time.time()
+    stale_keys = [k for k, v in active_sessions.items() if current_time - v > 15]
+    for k in stale_keys:
+        del active_sessions[k]
+    # In a real environment, you might want to return actual active users.
+    # We will add a small offset so it doesn't look completely empty if they test it alone.
+    real_count = len(active_sessions)
+    return jsonify({"live_count": real_count})
+
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5000, host='0.0.0.0')
+    app.run(debug=False, port=5001, host='0.0.0.0')
