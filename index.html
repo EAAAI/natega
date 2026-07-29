@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نتيجة الثانوية العامة 2025</title>
+    <title>نتيجة الثانوية العامة 2026</title>
     <meta name="description" content="استعلم عن نتيجة الثانوية العامة برقم الجلوس أو الاسم الثلاثي">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -386,6 +389,28 @@
             font-weight: 600;
         }
 
+        .nav-btn {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+            color: var(--primary-light);
+        }
+
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -567,6 +592,52 @@
             transition: width 1s ease;
             background: linear-gradient(90deg, var(--primary), #8b5cf6, var(--accent));
         }
+
+        /* Chart & QR */
+        .chart-container {
+            width: 100%;
+            height: 250px;
+            margin-top: 20px;
+            display: none;
+            background: var(--bg-input);
+            border-radius: 14px;
+            padding: 16px;
+        }
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 16px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Print Mode */
+        @media print {
+            body { background: white !important; color: black !important; }
+            .bg-animation, .header, .stats-bar, .search-section, .nav-btn, .footer, .percentage-bar, .chart-container { display: none !important; }
+            .results-section { display: block !important; }
+            .result-card { 
+                background: white !important; 
+                border: 2px solid #000 !important; 
+                box-shadow: none !important; 
+                color: black !important;
+                page-break-inside: avoid !important;
+                margin: 0 0 20px 0 !important;
+                padding: 20px !important;
+            }
+            .student-name { color: black !important; }
+            .student-seat { background: none !important; border: 1px solid #000 !important; color: black !important; }
+            .status-badge { background: none !important; border: 1px solid #000 !important; color: black !important; }
+            .result-item { background: none !important; border: 1px solid #ccc !important; color: black !important; }
+            .result-item .item-value { color: black !important; }
+            .result-item .item-label { color: #333 !important; }
+            .results-count { display: none !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
     </style>
 </head>
 <body>
@@ -604,23 +675,64 @@
         </div>
 
         <!-- Search Section -->
+        <!-- Search Section -->
         <div class="search-section">
-            <div class="search-input-wrapper">
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    id="searchInput" 
-                    placeholder="أدخل رقم الجلوس أو الاسم الثلاثي..."
-                    autocomplete="off"
-                >
-                <span class="icon">🔍</span>
+            <div class="search-tabs">
+                <button class="search-tab active" id="tabSearch" onclick="switchTab('search')">🎓 بحث عن النتيجة</button>
+                <button class="search-tab" id="tabPredict" onclick="switchTab('predict')">🔮 توقع كليتك</button>
+                <button class="search-tab" id="tabTop" onclick="switchTab('top')">🏆 لوحة الأوائل</button>
             </div>
 
-            <button class="search-btn" id="searchBtn" onclick="performSearch()">
-                <span id="btnText">بحث عن النتيجة</span>
-            </button>
+            <!-- Search Tab Content -->
+            <div id="searchTabContent">
+                <div class="search-input-wrapper">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput" 
+                        placeholder="أدخل رقم الجلوس أو الاسم الثلاثي..."
+                        autocomplete="off"
+                    >
+                    <span class="icon">🔍</span>
+                </div>
+                <button class="search-btn" id="searchBtn" onclick="performSearch()">
+                    <span id="btnText">بحث عن النتيجة</span>
+                </button>
+                <p class="search-hint">ابحث برقم الجلوس أو اكتب الاسم الثلاثي (مثال: محمد أحمد علي)</p>
+            </div>
 
-            <p class="search-hint">ابحث برقم الجلوس أو اكتب الاسم الثلاثي (مثال: محمد أحمد علي)</p>
+            <!-- Predict Tab Content -->
+            <div id="predictTabContent" style="display: none;">
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <div class="search-input-wrapper" style="flex: 2; margin-bottom: 0;">
+                        <input 
+                            type="number" 
+                            class="search-input" 
+                            id="scoreInput" 
+                            placeholder="أدخل مجموعك (من 320)..."
+                            min="100" max="320" step="any"
+                        >
+                        <span class="icon">💯</span>
+                    </div>
+                    <select class="search-input" id="branchSelect" style="flex: 1; margin-bottom: 0; padding-right: 12px;">
+                        <option value="science">علمي علوم</option>
+                        <option value="math">علمي رياضة</option>
+                    </select>
+                </div>
+                <button class="search-btn" id="predictBtn" onclick="predictColleges()">
+                    <span id="predictBtnText">اعرض الكليات المتاحة</span>
+                </button>
+                <p class="search-hint">توقعات 2026 (مبنية على مؤشرات ونسب التنسيق المرجحة)</p>
+            </div>
+
+            <!-- Top Students Tab Content -->
+            <div id="topTabContent" style="display: none; text-align: center;">
+                <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 1.3rem;">أوائل الجمهورية 2026</h3>
+                <p class="search-hint" style="margin-bottom: 20px;">الطلاب الحاصلين على أعلى المجاميع على مستوى الجمهورية.</p>
+                <button class="search-btn" id="topBtn" onclick="showTopStudents()">
+                    <span id="topBtnText">عرض لوحة الشرف</span>
+                </button>
+            </div>
         </div>
 
         <!-- Results Section -->
@@ -641,6 +753,8 @@
         // Data variables
         let chunksData = []; // Array of chunks (arrays of arrays)
         let isDataLoaded = false;
+        let distributionBins = [0, 0, 0, 0, 0, 0, 0]; // <50, 50-60, 60-70, 70-80, 80-90, 90-95, >95
+        let tansikData = null; // Will hold Tansik expected data
         
         let stats = {
             total_students: 0,
@@ -711,14 +825,31 @@
                     const chunk = chunksData[i];
                     for (let j = 0; j < chunk.length; j++) {
                         const caseId = chunk[j][4];
+                        const percentage = chunk[j][5];
                         stats.total_students++;
                         if (caseId === 1) stats.passed++;
                         else if (caseId === 2) stats.second_round++;
                         else if (caseId === 3) stats.failed++;
                         else if (caseId === 4) stats.absent++;
+                        
+                        if (percentage >= 95) distributionBins[6]++;
+                        else if (percentage >= 90) distributionBins[5]++;
+                        else if (percentage >= 80) distributionBins[4]++;
+                        else if (percentage >= 70) distributionBins[3]++;
+                        else if (percentage >= 60) distributionBins[2]++;
+                        else if (percentage >= 50) distributionBins[1]++;
+                        else distributionBins[0]++;
                     }
                     const percent = Math.round(((i + 1) / chunksData.length) * 100);
                     btnText.innerHTML = `<span class="spinner"></span> جاري تهيئة البيانات... ${percent}%`;
+                }
+
+                // Fetch Tansik Data
+                try {
+                    const tansikRes = await fetch('json_data/tansik_2026.json');
+                    if(tansikRes.ok) tansikData = await tansikRes.json();
+                } catch(e) {
+                    console.error('Failed to load tansik data', e);
                 }
 
                 isDataLoaded = true;
@@ -735,6 +866,14 @@
                 console.error('Failed to load data:', e);
                 btnText.textContent = '❌ حدث خطأ في التحميل';
             }
+            
+            // Auto search if ?seat= URL param is provided
+            const urlParams = new URLSearchParams(window.location.search);
+            const seatParam = urlParams.get('seat');
+            if (seatParam) {
+                document.getElementById('searchInput').value = seatParam;
+                performSearch();
+            }
         }
 
         // Enter key to search
@@ -742,7 +881,7 @@
             if (e.key === 'Enter') performSearch();
         });
 
-        function performSearch() {
+        function performSearch(isNav = false) {
             if (!isDataLoaded) {
                 showMessage('⚠️', 'يرجى الانتظار حتى يكتمل تحميل قاعدة البيانات.', 'error');
                 return;
@@ -754,8 +893,10 @@
             const btn = document.getElementById('searchBtn');
             const btnText = document.getElementById('btnText');
             
-            btn.classList.add('loading');
-            btnText.innerHTML = '<span class="spinner"></span> جاري البحث...';
+            if (!isNav) {
+                btn.classList.add('loading');
+                btnText.innerHTML = '<span class="spinner"></span> جاري البحث...';
+            }
 
             // Use setTimeout to allow UI to update before heavy search
             setTimeout(() => {
@@ -820,15 +961,17 @@
                     if (limitedResults.length === 0) {
                         showMessage('😕', 'لم يتم العثور على نتائج. تأكد من صحة البيانات المُدخلة.', '');
                     } else {
-                        displayResults(limitedResults, totalFound);
+                        displayResults(limitedResults, totalFound, isNav);
                     }
 
                 } catch (e) {
                     console.error(e);
                     showMessage('❌', 'حدث خطأ في البحث.', 'error');
                 } finally {
-                    btn.classList.remove('loading');
-                    btnText.textContent = 'بحث عن النتيجة';
+                    if (!isNav) {
+                        btn.classList.remove('loading');
+                        btnText.textContent = 'بحث عن النتيجة';
+                    }
                 }
             }, 10);
         }
@@ -860,7 +1003,7 @@
             return `<span class="status-badge">${status}</span>`;
         }
 
-        function displayResults(results, total) {
+        function displayResults(results, total, isNav = false) {
             const section = document.getElementById('resultsSection');
             const container = document.getElementById('resultsContainer');
             const countEl = document.getElementById('resultsCount');
@@ -874,13 +1017,19 @@
             container.innerHTML = results.map((r, i) => {
                 const isTop = r.percentage >= 95;
                 const topClass = isTop ? 'top-student' : '';
+                const animStyle = isNav ? 'animation: none;' : `animation-delay: ${i * 0.1}s;`;
                 
                 return `
-                <div class="result-card ${topClass}" style="animation-delay: ${i * 0.1}s">
+                <div class="result-card ${topClass}" id="card-${r.seating_no}" style="${animStyle}">
                     <div class="result-card-header">
                         <div>
                             <div class="student-name">${r.name}</div>
                             <div class="student-seat">🎫 رقم الجلوس: ${r.seating_no}</div>
+                            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                                <button class="nav-btn" onclick="searchBySeat('${parseInt(r.seating_no) - 1}')">⬆️ اللي قبله</button>
+                                <button class="nav-btn" onclick="searchBySeat('${parseInt(r.seating_no) + 1}')">اللي بعده ⬇️</button>
+                                <button class="nav-btn" onclick="showLocalRank('${r.seating_no}', ${r.total})" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #34d399;">📍 ترتيب لجنتك</button>
+                            </div>
                         </div>
                         ${getStatusBadge(r.status)}
                     </div>
@@ -908,8 +1057,28 @@
                         </div>
                     </div>
 
-                    <div class="percentage-bar">
+                    <div class="percentage-bar" style="margin-bottom: 16px;">
                         <div class="fill" style="width: ${Math.min(r.percentage, 100)}%"></div>
+                    </div>
+                    
+                    <div class="qr-container" id="qr-${r.seating_no}"></div>
+                    <div class="chart-container" id="chart-wrap-${r.seating_no}">
+                        <canvas id="chart-${r.seating_no}"></canvas>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px;">
+                        <button class="nav-btn" style="border-color: #a855f7; color: #a855f7;" onclick="toggleChart('${r.seating_no}', ${r.percentage})">
+                            📊 تحليل النتيجة
+                        </button>
+                        <button class="nav-btn" style="border-color: #64748b; color: #64748b;" onclick="window.print()">
+                            🖨️ طباعة
+                        </button>
+                        <button class="nav-btn" style="border-color: #25D366; color: #25D366;" onclick="shareWhatsApp('${r.name}', ${r.percentage}, '${r.status}')">
+                            📱 شارك واتساب
+                        </button>
+                        <button class="nav-btn" style="border-color: var(--info); color: var(--info);" onclick="downloadCard('${r.seating_no}')">
+                            📸 حفظ كصورة
+                        </button>
                     </div>
                 </div>
                 `;
@@ -917,8 +1086,267 @@
 
             section.classList.add('visible');
 
-            // Smooth scroll to results
+            // Initialize QR Codes
+            results.forEach(r => {
+                const qrUrl = window.location.href.split('?')[0] + "?seat=" + r.seating_no;
+                new QRCode(document.getElementById("qr-" + r.seating_no), {
+                    text: qrUrl,
+                    width: 100,
+                    height: 100,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.L
+                });
+            });
+
+            // Smooth scroll only on initial search, not when navigating
+            if (!isNav) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function searchBySeat(seatNo) {
+            switchTab('search');
+            document.getElementById('searchInput').value = seatNo;
+            performSearch(true);
+        }
+
+        // --- Prediction Feature Logic ---
+        function switchTab(tabId) {
+            ['tabSearch', 'tabPredict', 'tabTop'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('active');
+            });
+            ['searchTabContent', 'predictTabContent', 'topTabContent'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'none';
+            });
+
+            if (tabId === 'search') {
+                document.getElementById('tabSearch').classList.add('active');
+                document.getElementById('searchTabContent').style.display = 'block';
+            } else if (tabId === 'predict') {
+                document.getElementById('tabPredict').classList.add('active');
+                document.getElementById('predictTabContent').style.display = 'block';
+            } else if (tabId === 'top') {
+                document.getElementById('tabTop').classList.add('active');
+                document.getElementById('topTabContent').style.display = 'block';
+            }
+            
+            // Clear results
+            document.getElementById('resultsSection').classList.remove('visible');
+        }
+
+        function predictColleges() {
+            if (!tansikData) {
+                showMessage('⚠️', 'جاري تحميل بيانات التنسيق، يرجى المحاولة بعد قليل.', 'error');
+                return;
+            }
+
+            const score = parseFloat(document.getElementById('scoreInput').value);
+            const branch = document.getElementById('branchSelect').value;
+
+            if (isNaN(score) || score < 100 || score > 320) {
+                showMessage('⚠️', 'يرجى إدخال مجموع صحيح بين 100 و 320', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('predictBtn');
+            const btnText = document.getElementById('predictBtnText');
+            btn.classList.add('loading');
+            btnText.innerHTML = '<span class="spinner"></span> جاري البحث...';
+
+            setTimeout(() => {
+                const availableColleges = (tansikData[branch] || []).filter(c => score >= c.min_score);
+                
+                // Show top 30 matched colleges
+                const topMatches = availableColleges.slice(0, 30);
+                
+                if (topMatches.length === 0) {
+                    showMessage('😕', 'لم يتم العثور على كليات متاحة في الشريحة المطلوبة.', '');
+                } else {
+                    displayPredictResults(topMatches, availableColleges.length, score);
+                }
+                
+                btn.classList.remove('loading');
+                btnText.textContent = 'اعرض الكليات المتاحة';
+            }, 300);
+        }
+
+        function displayPredictResults(colleges, totalCount, userScore) {
+            const section = document.getElementById('resultsSection');
+            const container = document.getElementById('resultsContainer');
+            const countEl = document.getElementById('resultsCount');
+
+            const userPercentage = ((userScore / 320) * 100).toFixed(2);
+            countEl.innerHTML = `متاح لك <span>${formatNumber(totalCount)}</span> كلية ومعهد بناءً على مجموعك (${userPercentage}%)`;
+
+            container.innerHTML = colleges.map((c, i) => {
+                const collegePercentage = ((c.min_score / 320) * 100).toFixed(2);
+                return `
+                <div class="result-card" style="animation-delay: ${i * 0.05}s; padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="student-name" style="font-size: 1.1rem; color: var(--text-primary);">${c.name}</div>
+                        <div class="status-badge passed" style="font-size: 0.9rem;">
+                            الحد الأدنى المتوقع: ${collegePercentage}%
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            section.classList.add('visible');
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // --- New Viral Features Logic ---
+        let charts = {};
+        
+        function toggleChart(seatNo, userPercentage) {
+            const wrap = document.getElementById('chart-wrap-' + seatNo);
+            if (wrap.style.display === 'block') {
+                wrap.style.display = 'none';
+                return;
+            }
+            wrap.style.display = 'block';
+            
+            if (charts[seatNo]) return; // Already initialized
+            
+            const ctx = document.getElementById('chart-' + seatNo).getContext('2d');
+            const labels = ['أقل من 50%', '50-60%', '60-70%', '70-80%', '80-90%', '90-95%', 'أعلى من 95%'];
+            
+            // Determine which bin the user falls into
+            let userBin = 0;
+            if (userPercentage >= 95) userBin = 6;
+            else if (userPercentage >= 90) userBin = 5;
+            else if (userPercentage >= 80) userBin = 4;
+            else if (userPercentage >= 70) userBin = 3;
+            else if (userPercentage >= 60) userBin = 2;
+            else if (userPercentage >= 50) userBin = 1;
+            
+            const backgroundColors = labels.map((_, i) => 
+                i === userBin ? 'rgba(99, 102, 241, 0.8)' : 'rgba(148, 163, 184, 0.2)'
+            );
+            const borderColors = labels.map((_, i) => 
+                i === userBin ? 'rgba(99, 102, 241, 1)' : 'rgba(148, 163, 184, 0.5)'
+            );
+
+            charts[seatNo] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'عدد الطلاب',
+                        data: distributionBins,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'توزيع درجات الجمهورية وموقعك منها', color: '#f1f5f9' }
+                    },
+                    scales: {
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#2d2d4a' } },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function shareWhatsApp(name, percentage, status) {
+            const text = `الحمد لله.. نتيجتي في الثانوية العامة ${percentage}% (ناجح) 🎓 - عقبال الباقي\n\nالاسم: ${name}\nحالة الطالب: ${status}\n\nتقدر تجيب نتيجتك من هنا: ${window.location.href.split('?')[0]}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`);
+        }
+
+        function downloadCard(seatNo) {
+            const card = document.getElementById('card-' + seatNo);
+            if (!card || typeof html2canvas === 'undefined') {
+                alert('جاري تحميل المكاتب اللازمة، يرجى المحاولة بعد قليل.');
+                return;
+            }
+            // Hide interactive buttons temporarily
+            const buttons = card.querySelectorAll('button');
+            buttons.forEach(b => b.style.display = 'none');
+            
+            html2canvas(card, { backgroundColor: '#0f0f23' }).then(canvas => {
+                buttons.forEach(b => b.style.display = ''); // Restore buttons
+                const link = document.createElement('a');
+                link.download = `natega_${seatNo}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function showTopStudents() {
+            if (!isDataLoaded) {
+                showMessage('⚠️', 'يرجى الانتظار حتى يكتمل تحميل قاعدة البيانات.', 'error');
+                return;
+            }
+            const btn = document.getElementById('topBtn');
+            const btnText = document.getElementById('topBtnText');
+            btn.classList.add('loading');
+            btnText.innerHTML = '<span class="spinner"></span> جاري استخراج الأوائل...';
+            
+            setTimeout(() => {
+                let topStudents = [];
+                for (let i = 0; i < chunksData.length; i++) {
+                    const chunk = chunksData[i];
+                    for (let j = 0; j < chunk.length; j++) {
+                        if (chunk[j][6] <= 100) { // Top 100 on Republic
+                            topStudents.push(chunk[j]);
+                        }
+                    }
+                }
+                topStudents.sort((a, b) => a[6] - b[6]); // Sort by rank
+                
+                const formattedTop = topStudents.map(r => ({
+                    seating_no: r[0], name: r[1], total: r[3],
+                    status: caseMap[r[4]] || '', percentage: r[5],
+                    rank: r[6], top_percent: r[7], total_students: stats.total_students
+                }));
+                
+                displayResults(formattedTop, topStudents.length);
+                
+                btn.classList.remove('loading');
+                btnText.textContent = 'عرض لوحة الشرف';
+            }, 50);
+        }
+
+        function showLocalRank(seatNo, userTotal) {
+            if (!isDataLoaded) return;
+            const targetSeat = parseInt(seatNo);
+            let neighbors = [];
+            
+            // Gather 40 neighbors (assuming a committee/school block)
+            for (let i = 0; i < chunksData.length; i++) {
+                const chunk = chunksData[i];
+                for (let j = 0; j < chunk.length; j++) {
+                    const s = parseInt(chunk[j][0]);
+                    if (Math.abs(s - targetSeat) <= 20) {
+                        neighbors.push(chunk[j]);
+                    }
+                }
+            }
+            
+            neighbors.sort((a, b) => b[3] - a[3]); // sort by total descending
+            const rank = neighbors.findIndex(r => parseInt(r[0]) === targetSeat) + 1;
+            const percentageRank = Math.round((rank / neighbors.length) * 100);
+            
+            let message = `📍 تقرير لجنتك ومدرستك\n\n`;
+            message += `- عدد طلاب لجنتك تقريباً: ${neighbors.length} طالب\n`;
+            message += `- ترتيبك على اللجنة: ${rank} من ${neighbors.length}\n`;
+            
+            if (rank === 1) message += `\n🌟 عاش جداً يا بطل! أنت الأول على لجنتك!`;
+            else if (rank <= 5) message += `\n🔥 ممتاز! أنت من الأوائل على لجنتك!`;
+            else message += `\n💪 أداؤك أفضل من ${100 - percentageRank}% من زمايلك في اللجنة!`;
+            
+            alert(message);
         }
     </script>
 </body>
