@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نتيجة الثانوية العامة 2026</title>
     <meta name="description" content="استعلم عن نتيجة الثانوية العامة برقم الجلوس أو الاسم الثلاثي">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -91,10 +93,23 @@
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(30px, -50px) scale(1.1); }
-            50% { transform: translate(-20px, 20px) scale(0.9); }
-            75% { transform: translate(50px, 30px) scale(1.05); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            75% {
+                transform: translate(50px, 30px) scale(1.05);
+            }
         }
 
         .container {
@@ -107,19 +122,42 @@
 
         /* Live Counter */
         .live-counter {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 6px 16px; border-radius: 20px; color: #34d399;
-            font-size: 0.95rem; font-weight: 700; margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            color: #34d399;
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-top: 16px;
         }
+
         .pulse-dot {
-            width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
             animation: pulse-dot-anim 2s infinite;
         }
+
         @keyframes pulse-dot-anim {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
         }
 
         /* Header */
@@ -143,8 +181,15 @@
         }
 
         @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 8px 32px var(--glow); }
-            50% { box-shadow: 0 8px 48px rgba(99, 102, 241, 0.5); }
+
+            0%,
+            100% {
+                box-shadow: 0 8px 32px var(--glow);
+            }
+
+            50% {
+                box-shadow: 0 8px 48px rgba(99, 102, 241, 0.5);
+            }
         }
 
         .header h1 {
@@ -198,10 +243,21 @@
             font-weight: 500;
         }
 
-        .stat-card.passed .stat-value { color: var(--success); }
-        .stat-card.second .stat-value { color: var(--warning); }
-        .stat-card.failed .stat-value { color: var(--danger); }
-        .stat-card.total .stat-value { color: var(--primary-light); }
+        .stat-card.passed .stat-value {
+            color: var(--success);
+        }
+
+        .stat-card.second .stat-value {
+            color: var(--warning);
+        }
+
+        .stat-card.failed .stat-value {
+            color: var(--danger);
+        }
+
+        .stat-card.total .stat-value {
+            color: var(--primary-light);
+        }
 
         /* Search Section */
         .search-section {
@@ -291,7 +347,7 @@
             box-shadow: 0 0 0 4px var(--glow);
         }
 
-        .search-input:focus + .icon {
+        .search-input:focus+.icon {
             color: var(--primary-light);
         }
 
@@ -345,8 +401,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .results-count {
@@ -497,10 +560,21 @@
             font-weight: 500;
         }
 
-        .result-item.total-score .item-value { color: var(--primary-light); }
-        .result-item.percentage .item-value { color: var(--accent); }
-        .result-item.rank .item-value { color: var(--success); }
-        .result-item.top-percent .item-value { color: #f472b6; }
+        .result-item.total-score .item-value {
+            color: var(--primary-light);
+        }
+
+        .result-item.percentage .item-value {
+            color: var(--accent);
+        }
+
+        .result-item.rank .item-value {
+            color: var(--success);
+        }
+
+        .result-item.top-percent .item-value {
+            color: #f472b6;
+        }
 
         /* Error and Empty States */
         .message-box {
@@ -519,13 +593,15 @@
             font-weight: 500;
         }
 
-        .message-box.error .msg-icon { color: var(--danger); }
+        .message-box.error .msg-icon {
+            color: var(--danger);
+        }
 
         /* Loading spinner */
         .spinner {
             width: 22px;
             height: 22px;
-            border: 3px solid rgba(255,255,255,0.3);
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
@@ -533,12 +609,21 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes cardIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         /* Footer */
@@ -556,19 +641,49 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container { padding: 12px; }
-            .header h1 { font-size: 1.5rem; }
-            .stats-bar { grid-template-columns: repeat(2, 1fr); }
-            .result-grid { grid-template-columns: repeat(2, 1fr); }
-            .search-section { padding: 20px; border-radius: 18px; }
-            .result-card { padding: 18px; }
-            .student-name { font-size: 1.1rem; }
-            .stat-card .stat-value { font-size: 1.1rem; }
+            .container {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .result-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .search-section {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .result-card {
+                padding: 18px;
+            }
+
+            .student-name {
+                font-size: 1.1rem;
+            }
+
+            .stat-card .stat-value {
+                font-size: 1.1rem;
+            }
         }
 
         @media (max-width: 400px) {
-            .result-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-            .result-item { padding: 12px 8px; }
+            .result-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .result-item {
+                padding: 12px 8px;
+            }
         }
 
         /* Confetti animation for top students */
@@ -620,6 +735,7 @@
             border-radius: 14px;
             padding: 16px;
         }
+
         .qr-container {
             display: flex;
             justify-content: center;
@@ -631,77 +747,236 @@
             margin-left: auto;
             margin-right: auto;
         }
-        
+
         /* Print Mode */
         @media print {
-            body { background: white !important; color: black !important; overflow: visible !important; }
-            .bg-animation, .header, .stats-bar, .search-section, .nav-btn, .footer, .percentage-bar, .chart-container, .modal-close { display: none !important; }
-            .modal-overlay { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; display: block !important; background: white !important; align-items: flex-start !important; }
-            .modal-content { background: white !important; border: none !important; box-shadow: none !important; color: black !important; width: 100% !important; transform: none !important; padding: 0 !important; max-height: none !important; overflow: visible !important; }
-            .student-name, .student-seat, .status-badge, .result-item, .result-item .item-value, .result-item .item-label { color: black !important; border-color: #000 !important; }
-            .qr-container { display: flex !important; }
-            .results-section { display: none !important; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body {
+                background: white !important;
+                color: black !important;
+                overflow: visible !important;
+            }
+
+            .bg-animation,
+            .header,
+            .stats-bar,
+            .search-section,
+            .nav-btn,
+            .footer,
+            .percentage-bar,
+            .chart-container,
+            .modal-close {
+                display: none !important;
+            }
+
+            .modal-overlay {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                display: block !important;
+                background: white !important;
+                align-items: flex-start !important;
+            }
+
+            .modal-content {
+                background: white !important;
+                border: none !important;
+                box-shadow: none !important;
+                color: black !important;
+                width: 100% !important;
+                transform: none !important;
+                padding: 0 !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            .student-name,
+            .student-seat,
+            .status-badge,
+            .result-item,
+            .result-item .item-value,
+            .result-item .item-label {
+                color: black !important;
+                border-color: #000 !important;
+            }
+
+            .qr-container {
+                display: flex !important;
+            }
+
+            .results-section {
+                display: none !important;
+            }
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
         }
 
         /* Modal Styles */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 15, 35, 0.9); backdrop-filter: blur(5px);
-            z-index: 1000; display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 35, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .modal-overlay.active { display: flex; opacity: 1; }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
         .modal-content {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 24px; width: 90%; max-width: 600px; max-height: 90vh;
-            overflow-y: auto; padding: 24px; position: relative;
-            transform: translateY(20px); transition: transform 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
         }
-        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
         .modal-close {
-            position: absolute; top: 16px; left: 16px;
-            background: rgba(239, 68, 68, 0.1); color: var(--danger);
-            border: none; border-radius: 50%; width: 36px; height: 36px;
-            font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.3s;
         }
-        .modal-close:hover { background: var(--danger); color: white; }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+        }
 
         /* Autocomplete Styles */
         .autocomplete-dropdown {
-            position: absolute; top: 100%; left: 0; right: 0;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 12px; margin-top: 4px; z-index: 100;
-            max-height: 200px; overflow-y: auto; display: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 4px;
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
+
         .autocomplete-item {
-            padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border);
-            color: var(--text-primary); transition: background 0.2s;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            transition: background 0.2s;
         }
-        .autocomplete-item:hover { background: var(--bg-input); color: var(--primary-light); }
-        .autocomplete-item:last-child { border-bottom: none; }
+
+        .autocomplete-item:hover {
+            background: var(--bg-input);
+            color: var(--primary-light);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
 
         /* Certificate Template (Hidden) */
         .certificate-wrapper {
-            position: fixed; top: -9999px; left: -9999px;
-            width: 800px; height: 600px; background: white; color: black;
-            padding: 20px; box-sizing: border-box;
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            width: 800px;
+            height: 600px;
+            background: white;
+            color: black;
+            padding: 20px;
+            box-sizing: border-box;
         }
+
         .certificate-border {
-            border: 10px solid #d4af37; height: 100%; box-sizing: border-box;
-            padding: 40px; text-align: center; position: relative;
+            border: 10px solid #d4af37;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 40px;
+            text-align: center;
+            position: relative;
             background: #fffefa;
         }
-        .cert-title { font-size: 3rem; color: #d4af37; margin-bottom: 20px; font-weight: 900; font-family: 'Cairo', sans-serif; }
-        .cert-subtitle { font-size: 1.5rem; color: #333; margin-bottom: 30px; }
-        .cert-name { font-size: 3.5rem; color: #000; font-weight: bold; margin-bottom: 30px; border-bottom: 2px solid #d4af37; display: inline-block; padding: 0 40px; }
-        .cert-score { font-size: 1.8rem; color: #d4af37; font-weight: bold; }
-        .cert-footer { position: absolute; bottom: 40px; width: calc(100% - 80px); display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #555; }
 
+        .cert-title {
+            font-size: 3rem;
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-weight: 900;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .cert-subtitle {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .cert-name {
+            font-size: 3.5rem;
+            color: #000;
+            font-weight: bold;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #d4af37;
+            display: inline-block;
+            padding: 0 40px;
+        }
+
+        .cert-score {
+            font-size: 1.8rem;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .cert-footer {
+            position: absolute;
+            bottom: 40px;
+            width: calc(100% - 80px);
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #555;
+        }
     </style>
 </head>
+
 <body>
     <div class="bg-animation">
         <div class="orb"></div>
@@ -753,13 +1028,8 @@
             <!-- Search Tab Content -->
             <div id="searchTabContent">
                 <div class="search-input-wrapper">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="searchInput" 
-                        placeholder="أدخل رقم الجلوس أو الاسم الثلاثي..."
-                        autocomplete="off"
-                    >
+                    <input type="text" class="search-input" id="searchInput"
+                        placeholder="أدخل رقم الجلوس أو الاسم الثلاثي..." autocomplete="off">
                     <span class="icon">🔍</span>
                     <div class="autocomplete-dropdown" id="autocompleteList"></div>
                 </div>
@@ -769,15 +1039,12 @@
                 <p class="search-hint">ابحث برقم الجلوس أو اكتب الاسم الثلاثي (مثال: محمد أحمد علي)</p>
             </div>
 
-            
+
             <!-- Friends Tab Content -->
             <div id="friendsTabContent" style="display: none;">
-                <textarea 
-                    class="search-input" 
-                    id="friendsInput" 
+                <textarea class="search-input" id="friendsInput"
                     placeholder="أدخل أرقام جلوس أو أسماء أصدقائك مفصولة بمسافة (مثال: 12345 احمد)..."
-                    style="min-height: 100px; resize: vertical; margin-bottom: 16px;"
-                ></textarea>
+                    style="min-height: 100px; resize: vertical; margin-bottom: 16px;"></textarea>
                 <button class="search-btn" id="friendsBtn" onclick="compareFriends()">
                     <span id="friendsBtnText">ابحث وقارن الشلة</span>
                 </button>
@@ -788,16 +1055,12 @@
             <div id="predictTabContent" style="display: none;">
                 <div style="display: flex; gap: 12px; margin-bottom: 16px;">
                     <div class="search-input-wrapper" style="flex: 2; margin-bottom: 0;">
-                        <input 
-                            type="number" 
-                            class="search-input" 
-                            id="scoreInput" 
-                            placeholder="أدخل مجموعك (من 320)..."
-                            min="100" max="320" step="any"
-                        >
+                        <input type="number" class="search-input" id="scoreInput" placeholder="أدخل مجموعك (من 320)..."
+                            min="100" max="320" step="any">
                         <span class="icon">💯</span>
                     </div>
-                    <select class="search-input" id="branchSelect" style="flex: 1; margin-bottom: 0; padding-right: 12px;">
+                    <select class="search-input" id="branchSelect"
+                        style="flex: 1; margin-bottom: 0; padding-right: 12px;">
                         <option value="science">علمي علوم</option>
                         <option value="math">علمي رياضة</option>
                     </select>
@@ -810,8 +1073,10 @@
 
             <!-- Top Students Tab Content -->
             <div id="topTabContent" style="display: none; text-align: center;">
-                <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 1.3rem;">أوائل الجمهورية 2026</h3>
-                <p class="search-hint" style="margin-bottom: 20px;">الطلاب الحاصلين على أعلى المجاميع على مستوى الجمهورية.</p>
+                <h3 style="color: var(--text-primary); margin-bottom: 12px; font-size: 1.3rem;">أوائل الجمهورية 2026
+                </h3>
+                <p class="search-hint" style="margin-bottom: 20px;">الطلاب الحاصلين على أعلى المجاميع على مستوى
+                    الجمهورية.</p>
                 <button class="search-btn" id="topBtn" onclick="showTopStudents()">
                     <span id="topBtnText">عرض لوحة الشرف</span>
                 </button>
@@ -824,7 +1089,7 @@
             <div id="resultsContainer"></div>
         </div>
 
-        
+
         <!-- Student Profile Modal -->
         <div class="modal-overlay" id="studentModal">
             <div class="modal-content" id="modalContent">
@@ -851,7 +1116,8 @@
         <footer class="footer">
             <p>نتيجة الثانوية العامة - النظام الحديث 2026</p>
             <p style="margin-top: 8px; font-size: 0.9rem;">
-                Developed by <a href="https://www.linkedin.com/in/ibrahim-kfs/" target="_blank" rel="noopener noreferrer" style="font-weight: bold;">Eng Ibrahim Mohamed</a>
+                Developed by <a href="https://www.linkedin.com/in/ibrahim-kfs/" target="_blank"
+                    rel="noopener noreferrer" style="font-weight: bold;">Eng Ibrahim Mohamed</a>
             </p>
         </footer>
     </div>
@@ -862,7 +1128,7 @@
         let isDataLoaded = false;
         let distributionBins = [0, 0, 0, 0, 0, 0, 0]; // <50, 50-60, 60-70, 70-80, 80-90, 90-95, >95
         let tansikData = null; // Will hold Tansik expected data
-        
+
         let stats = {
             total_students: 0,
             passed: 0,
@@ -900,7 +1166,7 @@
         async function initApp() {
             const btn = document.getElementById('searchBtn');
             const btnText = document.getElementById('btnText');
-            
+
             btn.classList.add('loading');
             btnText.innerHTML = '<span class="spinner"></span> جاري تهيئة البيانات... 0%';
 
@@ -909,7 +1175,7 @@
                 const cache = await caches.open('natega-cache-v1');
                 const chunkPromises = [];
 
-                for(let i = 0; i <= 6; i++) {
+                for (let i = 0; i <= 6; i++) {
                     const url = `json_data/data_${i}.json`;
                     chunkPromises.push(
                         cache.match(url).then(async (cachedResponse) => {
@@ -917,7 +1183,7 @@
                                 return cachedResponse.json();
                             } else {
                                 const fetchResponse = await fetch(url);
-                                if(fetchResponse.ok) cache.put(url, fetchResponse.clone());
+                                if (fetchResponse.ok) cache.put(url, fetchResponse.clone());
                                 return fetchResponse.json();
                             }
                         })
@@ -926,7 +1192,7 @@
 
                 // Await all fetch requests (loads concurrently)
                 chunksData = await Promise.all(chunkPromises);
-                
+
                 // Calculate stats instantly without allocating objects
                 for (let i = 0; i < chunksData.length; i++) {
                     const chunk = chunksData[i];
@@ -938,7 +1204,7 @@
                         else if (caseId === 2) stats.second_round++;
                         else if (caseId === 3) stats.failed++;
                         else if (caseId === 4) stats.absent++;
-                        
+
                         if (percentage >= 95) distributionBins[6]++;
                         else if (percentage >= 90) distributionBins[5]++;
                         else if (percentage >= 80) distributionBins[4]++;
@@ -954,15 +1220,15 @@
                 // Fetch Tansik Data
                 try {
                     const tansikRes = await fetch('json_data/tansik_2026.json');
-                    if(tansikRes.ok) tansikData = await tansikRes.json();
-                } catch(e) {
+                    if (tansikRes.ok) tansikData = await tansikRes.json();
+                } catch (e) {
                     console.error('Failed to load tansik data', e);
                 }
 
                 isDataLoaded = true;
                 btn.classList.remove('loading');
                 btnText.textContent = 'بحث عن النتيجة';
-                
+
                 // Update stats UI
                 document.getElementById('statTotal').textContent = formatNumber(stats.total_students);
                 document.getElementById('statPassed').textContent = formatNumber(stats.passed);
@@ -973,7 +1239,7 @@
                 console.error('Failed to load data:', e);
                 btnText.textContent = '❌ حدث خطأ في التحميل';
             }
-            
+
 
             // Sync friends textarea with localStorage
             const friendsInput = document.getElementById('friendsInput');
@@ -995,18 +1261,18 @@
         // Autocomplete Logic
         const searchInputEl = document.getElementById('searchInput');
         const autocompleteList = document.getElementById('autocompleteList');
-        
-        searchInputEl.addEventListener('input', function() {
+
+        searchInputEl.addEventListener('input', function () {
             const query = this.value.trim();
             if (!query || /^\d+$/.test(query) || !isDataLoaded) {
                 autocompleteList.style.display = 'none';
                 return;
             }
-            
+
             const normalized = normalizeArabic(query);
             const searchNoSpace = normalized.replace(/ /g, '');
             let matches = [];
-            
+
             for (let i = 0; i < chunksData.length; i++) {
                 if (matches.length >= 5) break;
                 const chunk = chunksData[i];
@@ -1019,9 +1285,9 @@
                     }
                 }
             }
-            
+
             if (matches.length > 0) {
-                autocompleteList.innerHTML = matches.map(r => 
+                autocompleteList.innerHTML = matches.map(r =>
                     `<div class="autocomplete-item" onclick="selectAutocomplete('${r[0]}', '${r[1]}')">
                         ${r[1]} <span style="color:var(--text-muted); font-size:0.8rem;">(${r[0]})</span>
                     </div>`
@@ -1031,21 +1297,21 @@
                 autocompleteList.style.display = 'none';
             }
         });
-        
-        document.addEventListener('click', function(e) {
+
+        document.addEventListener('click', function (e) {
             if (e.target !== searchInputEl) {
                 autocompleteList.style.display = 'none';
             }
         });
 
         function selectAutocomplete(seatNo, name) {
-            searchInputEl.value = seatNo; 
+            searchInputEl.value = seatNo;
             autocompleteList.style.display = 'none';
             performSearch();
         }
 
         // Enter key to search
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') performSearch();
         });
 
@@ -1060,7 +1326,7 @@
 
             const btn = document.getElementById('searchBtn');
             const btnText = document.getElementById('btnText');
-            
+
             if (!isNav) {
                 btn.classList.add('loading');
                 btnText.innerHTML = '<span class="spinner"></span> جاري البحث...';
@@ -1080,7 +1346,7 @@
                         // Search by name
                         const normalized = normalizeArabic(query);
                         const parts = normalized.split(' ').filter(p => p.length > 0);
-                        
+
                         if (parts.length < 2) {
                             showMessage('⚠️', 'يرجى إدخال اسمين على الأقل', 'error');
                             btn.classList.remove('loading');
@@ -1148,7 +1414,7 @@
             const section = document.getElementById('resultsSection');
             const container = document.getElementById('resultsContainer');
             document.getElementById('resultsCount').textContent = '';
-            
+
             container.innerHTML = `
                 <div class="message-box ${type}">
                     <div class="msg-icon">${icon}</div>
@@ -1198,7 +1464,7 @@
                 <div class="result-card ${topClass}" id="card-${r.seating_no}" style="${animStyle} cursor: pointer; padding: 20px;" onclick="openStudentProfile('${rData}')">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <div class="student-name" style="font-size: 1.2rem;">${isFriends ? `<span style="color:var(--accent)">#${i+1}</span> ` : ''}${r.name}</div>
+                            <div class="student-name" style="font-size: 1.2rem;">${isFriends ? `<span style="color:var(--accent)">#${i + 1}</span> ` : ''}${r.name}</div>
                             <div class="student-seat" style="margin-top: 8px;">🎫 جلوس: ${r.seating_no} | المجموع: ${r.total}</div>
                         </div>
                         <div style="text-align: left;">
@@ -1220,18 +1486,51 @@
         }
 
 
+        function navigateModal(seatNo) {
+            if (!isDataLoaded) return;
+            let found = null;
+            for (let i = 0; i < chunksData.length; i++) {
+                const chunk = chunksData[i];
+                for (let j = 0; j < chunk.length; j++) {
+                    if (String(chunk[j][0]) === String(seatNo)) {
+                        found = chunk[j];
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+
+            if (found) {
+                const r = {
+                    seating_no: found[0], name: found[1], total: found[3], status: caseMap[found[4]] || '',
+                    percentage: found[5], rank: found[6], top_percent: found[7], total_students: stats.total_students
+                };
+                const rData = encodeURIComponent(JSON.stringify(r));
+
+                // Clear old chart to prevent overlapping glitches
+                if (window.modalChartInstance) {
+                    window.modalChartInstance.destroy();
+                    window.modalChartInstance = null;
+                }
+
+                openStudentProfile(rData);
+            } else {
+                showToast('لم يتم العثور على طالب بهذا الرقم.');
+            }
+        }
+
         function openStudentProfile(encodedData) {
             const r = JSON.parse(decodeURIComponent(encodedData));
             const modalBody = document.getElementById('modalBody');
-            
+
             // Check if friend
             const currentFriends = (document.getElementById('friendsInput').value || '').split(/[\s,]+/);
             const isFriend = currentFriends.includes(String(r.seating_no));
             const friendBtnText = isFriend ? '❌ إزالة' : '👥 أضف للشلة';
             const friendBtnColor = isFriend ? '#ef4444' : '#3b82f6';
 
-            
-            const certBtn = r.percentage >= 90 ? 
+
+            const certBtn = r.percentage >= 90 ?
                 `<button class="nav-btn" style="border-color: #d4af37; color: #d4af37; width: 100%; justify-content: center; padding: 12px; font-size: 1rem; margin-top: 16px; font-weight: bold; background: rgba(212, 175, 55, 0.1);" onclick="generateCertificate('${r.name}', ${r.percentage})">
                     📜 استخراج شهادة تفوق
                 </button>` : '';
@@ -1256,8 +1555,8 @@
                     </div>
 
                     <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap;">
-                        <button class="nav-btn" onclick="searchBySeat('${parseInt(r.seating_no) - 1}')">⬆️ اللي قبله</button>
-                        <button class="nav-btn" onclick="searchBySeat('${parseInt(r.seating_no) + 1}')">اللي بعده ⬇️</button>
+                        <button class="nav-btn" onclick="navigateModal('${parseInt(r.seating_no) - 1}')">⬆️ اللي قبله</button>
+                        <button class="nav-btn" onclick="navigateModal('${parseInt(r.seating_no) + 1}')">اللي بعده ⬇️</button>
                         <button class="nav-btn" onclick="showLocalRank('${r.seating_no}', ${r.total})" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #34d399;">📍 ترتيب لجنتك</button>
                         <button class="nav-btn" onclick="toggleNeighborsUi()" style="background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; color: #60a5fa;">🏫 استكشاف اللجنة</button>
                     </div>
@@ -1303,11 +1602,11 @@
                     </button>
                 </div>
             `;
-            
+
             document.getElementById('studentModal').classList.add('active');
-            
+
             // Audio effect
-            if(r.percentage >= 90) {
+            if (r.percentage >= 90) {
                 // Happy sound placeholder
             }
         }
@@ -1315,7 +1614,7 @@
 
         function toggleNeighborsUi() {
             const ui = document.getElementById('neighborsUi');
-            if(ui.style.display === 'none') ui.style.display = 'block';
+            if (ui.style.display === 'none') ui.style.display = 'block';
             else ui.style.display = 'none';
         }
 
@@ -1324,21 +1623,21 @@
             const count = parseInt(document.getElementById('neighborCount').value) || 20;
             const dir = document.getElementById('neighborDir').value;
             const target = parseInt(seatNo);
-            
+
             let start = target;
             let end = target;
-            
+
             if (dir === 'both') {
                 start = target - count;
                 end = target + count;
             } else if (dir === 'before') {
                 start = target - count;
-                end = target - 1; 
+                end = target - 1;
             } else if (dir === 'after') {
                 start = target + 1;
                 end = target + count;
             }
-            
+
             let results = [];
             for (let i = 0; i < chunksData.length; i++) {
                 const chunk = chunksData[i];
@@ -1349,19 +1648,19 @@
                     }
                 }
             }
-            
+
             if (results.length === 0) {
                 alert('لم يتم العثور على طلاب في هذا النطاق.');
                 return;
             }
-            
+
             results.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
-            
+
             const formatted = results.map(r => ({
                 seating_no: r[0], name: r[1], total: r[3], status: caseMap[r[4]] || '',
                 percentage: r[5], rank: r[6], top_percent: r[7], total_students: stats.total_students
             }));
-            
+
             closeModal();
             let label = dir === 'both' ? 'قبله وبعده' : (dir === 'before' ? 'قبله' : 'بعده');
             displayResults(formatted, formatted.length, false, false, `🏫 طلاب اللجنة (${label}) — عرض <span>${results.length}</span> طالب`);
@@ -1380,7 +1679,7 @@
             const textarea = document.getElementById('friendsInput');
             let currentVal = textarea.value.trim();
             let friendsArr = currentVal ? currentVal.split(/[\s,]+/) : [];
-            
+
             if (friendsArr.includes(seatNo)) {
                 // Remove
                 friendsArr = friendsArr.filter(f => f !== seatNo);
@@ -1399,11 +1698,11 @@
                 }
                 showToast('✅ تم إضافة الطالب إلى الشلة بنجاح!');
             }
-            
+
             textarea.value = friendsArr.join(' ');
             localStorage.setItem('natega_friends', textarea.value);
         }
-        
+
         function showToast(msg) {
             let toast = document.getElementById('toast-msg');
             if (!toast) {
@@ -1415,11 +1714,11 @@
             toast.textContent = msg;
             toast.style.opacity = '1';
             toast.style.bottom = '30px';
-            
-            if(window.toastTimeout) clearTimeout(window.toastTimeout);
-            window.toastTimeout = setTimeout(() => { 
-                toast.style.opacity = '0'; 
-                toast.style.bottom = '-50px'; 
+
+            if (window.toastTimeout) clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.bottom = '-50px';
             }, 3000);
         }
 
@@ -1431,7 +1730,7 @@
                 qrContainer.style.display = 'flex';
                 qrContainer.innerHTML = '';
                 const qrUrl = window.location.href.split('?')[0] + "?seat=" + seatNo;
-                new QRCode(qrContainer, { text: qrUrl, width: 120, height: 120, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.L });
+                new QRCode(qrContainer, { text: qrUrl, width: 120, height: 120, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.L });
             }
         }
 
@@ -1442,12 +1741,12 @@
                 return;
             }
             wrap.style.display = 'block';
-            
+
             if (window.modalChartInstance) return;
-            
+
             const ctx = document.getElementById('chart-modal').getContext('2d');
             const labels = ['أقل من 50%', '50-60%', '60-70%', '70-80%', '80-90%', '90-95%', 'أعلى من 95%'];
-            
+
             let userBin = 0;
             if (userPercentage >= 95) userBin = 6;
             else if (userPercentage >= 90) userBin = 5;
@@ -1455,7 +1754,7 @@
             else if (userPercentage >= 70) userBin = 3;
             else if (userPercentage >= 60) userBin = 2;
             else if (userPercentage >= 50) userBin = 1;
-            
+
             const bgColors = labels.map((_, i) => i === userBin ? 'rgba(99, 102, 241, 0.8)' : 'rgba(148, 163, 184, 0.2)');
             const borderCols = labels.map((_, i) => i === userBin ? 'rgba(99, 102, 241, 1)' : 'rgba(148, 163, 184, 0.5)');
 
@@ -1469,11 +1768,11 @@
         function generateCertificate(name, percentage) {
             document.getElementById('certName').textContent = name;
             document.getElementById('certScore').textContent = percentage + '%';
-            
+
             const node = document.getElementById('certificateNode');
             node.style.top = '0';
             node.style.zIndex = '-1';
-            
+
             html2canvas(node, { scale: 2 }).then(canvas => {
                 node.style.top = '-9999px';
                 const link = document.createElement('a');
@@ -1535,7 +1834,7 @@
                     }));
                     displayResults(formatted, formatted.length, false, true);
                 }
-                
+
                 btn.classList.remove('loading');
                 btnText.textContent = 'ابحث وقارن الشلة';
             }, 100);
@@ -1551,11 +1850,11 @@
         function switchTab(tabId) {
             ['tabSearch', 'tabPredict', 'tabTop', 'tabFriends'].forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.classList.remove('active');
+                if (el) el.classList.remove('active');
             });
             ['searchTabContent', 'predictTabContent', 'topTabContent', 'friendsTabContent'].forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.style.display = 'none';
+                if (el) el.style.display = 'none';
             });
 
             if (tabId === 'search') {
@@ -1571,7 +1870,7 @@
                 document.getElementById('tabFriends').classList.add('active');
                 document.getElementById('friendsTabContent').style.display = 'block';
             }
-            
+
             // Clear results
             document.getElementById('resultsSection').classList.remove('visible');
         }
@@ -1597,16 +1896,16 @@
 
             setTimeout(() => {
                 const availableColleges = (tansikData[branch] || []).filter(c => score >= c.min_score);
-                
+
                 // Show top 30 matched colleges
                 const topMatches = availableColleges.slice(0, 30);
-                
+
                 if (topMatches.length === 0) {
                     showMessage('😕', 'لم يتم العثور على كليات متاحة في الشريحة المطلوبة.', '');
                 } else {
                     displayPredictResults(topMatches, availableColleges.length, score);
                 }
-                
+
                 btn.classList.remove('loading');
                 btnText.textContent = 'اعرض الكليات المتاحة';
             }, 300);
@@ -1640,7 +1939,7 @@
 
         // --- New Viral Features Logic ---
         let charts = {};
-        
+
         function toggleChart(seatNo, userPercentage) {
             const wrap = document.getElementById('chart-wrap-' + seatNo);
             if (wrap.style.display === 'block') {
@@ -1648,12 +1947,12 @@
                 return;
             }
             wrap.style.display = 'block';
-            
+
             if (charts[seatNo]) return; // Already initialized
-            
+
             const ctx = document.getElementById('chart-' + seatNo).getContext('2d');
             const labels = ['أقل من 50%', '50-60%', '60-70%', '70-80%', '80-90%', '90-95%', 'أعلى من 95%'];
-            
+
             // Determine which bin the user falls into
             let userBin = 0;
             if (userPercentage >= 95) userBin = 6;
@@ -1662,11 +1961,11 @@
             else if (userPercentage >= 70) userBin = 3;
             else if (userPercentage >= 60) userBin = 2;
             else if (userPercentage >= 50) userBin = 1;
-            
-            const backgroundColors = labels.map((_, i) => 
+
+            const backgroundColors = labels.map((_, i) =>
                 i === userBin ? 'rgba(99, 102, 241, 0.8)' : 'rgba(148, 163, 184, 0.2)'
             );
-            const borderColors = labels.map((_, i) => 
+            const borderColors = labels.map((_, i) =>
                 i === userBin ? 'rgba(99, 102, 241, 1)' : 'rgba(148, 163, 184, 0.5)'
             );
 
@@ -1712,7 +2011,7 @@
             // Hide interactive buttons temporarily
             const buttons = card.querySelectorAll('button');
             buttons.forEach(b => b.style.display = 'none');
-            
+
             html2canvas(card, { backgroundColor: '#0f0f23' }).then(canvas => {
                 buttons.forEach(b => b.style.display = ''); // Restore buttons
                 const link = document.createElement('a');
@@ -1731,7 +2030,7 @@
             const btnText = document.getElementById('topBtnText');
             btn.classList.add('loading');
             btnText.innerHTML = '<span class="spinner"></span> جاري استخراج الأوائل...';
-            
+
             setTimeout(() => {
                 let topStudents = [];
                 for (let i = 0; i < chunksData.length; i++) {
@@ -1743,15 +2042,15 @@
                     }
                 }
                 topStudents.sort((a, b) => a[6] - b[6]); // Sort by rank
-                
+
                 const formattedTop = topStudents.map(r => ({
                     seating_no: r[0], name: r[1], total: r[3],
                     status: caseMap[r[4]] || '', percentage: r[5],
                     rank: r[6], top_percent: r[7], total_students: stats.total_students
                 }));
-                
+
                 displayResults(formattedTop, topStudents.length);
-                
+
                 btn.classList.remove('loading');
                 btnText.textContent = 'عرض لوحة الشرف';
             }, 50);
@@ -1761,7 +2060,7 @@
             if (!isDataLoaded) return;
             const targetSeat = parseInt(seatNo);
             let neighbors = [];
-            
+
             // Gather 40 neighbors (assuming a committee/school block)
             for (let i = 0; i < chunksData.length; i++) {
                 const chunk = chunksData[i];
@@ -1772,37 +2071,37 @@
                     }
                 }
             }
-            
+
             neighbors.sort((a, b) => b[3] - a[3]); // sort by total descending
             const rank = neighbors.findIndex(r => parseInt(r[0]) === targetSeat) + 1;
             const percentageRank = Math.round((rank / neighbors.length) * 100);
-            
+
             let message = `📍 تقرير لجنتك ومدرستك\n\n`;
             message += `- عدد طلاب لجنتك تقريباً: ${neighbors.length} طالب\n`;
             message += `- ترتيبك على اللجنة: ${rank} من ${neighbors.length}\n`;
-            
+
             if (rank === 1) message += `\n🌟 عاش جداً يا بطل! أنت الأول على لجنتك!`;
             else if (rank <= 5) message += `\n🔥 ممتاز! أنت من الأوائل على لجنتك!`;
             else message += `\n💪 أداؤك أفضل من ${100 - percentageRank}% من زمايلك في اللجنة!`;
-            
+
             alert(message);
         }
         // --- Live Counter Simulation ---
-        let baseLiveCount = Math.floor(Math.random() * (4500 - 2000 + 1) + 2000); 
-        
+        let baseLiveCount = Math.floor(Math.random() * (4500 - 2000 + 1) + 2000);
+
         function updateLiveCounter() {
             const el = document.getElementById('liveCount');
-            if(el) {
+            if (el) {
                 const change = Math.floor(Math.random() * 30) - 10;
                 baseLiveCount += change;
-                if(baseLiveCount < 1500) baseLiveCount = 1500;
+                if (baseLiveCount < 1500) baseLiveCount = 1500;
                 el.textContent = baseLiveCount.toLocaleString('ar-EG');
             }
             setTimeout(updateLiveCounter, Math.random() * 4000 + 2000);
         }
-        
+
         window.addEventListener('DOMContentLoaded', updateLiveCounter);
     </script>
 </body>
-</html>
 
+</html>
