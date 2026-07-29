@@ -630,13 +630,16 @@
         </div>
 
         <footer class="footer">
-            <p>نتيجة الثانوية العامة - النظام الحديث 2025</p>
+            <p>نتيجة الثانوية العامة - النظام الحديث 2026</p>
+            <p style="margin-top: 8px; font-size: 0.9rem;">
+                Developed by <a href="https://www.linkedin.com/in/ibrahim-kfs/" target="_blank" rel="noopener noreferrer" style="font-weight: bold;">Eng Ibrahim Mohamed</a>
+            </p>
         </footer>
     </div>
 
     <script>
         // Data variables
-        let studentsData = [];
+        let chunksData = []; // Array of chunks (arrays of arrays)
         let isDataLoaded = false;
         
         let stats = {
@@ -664,19 +667,13 @@
         // Normalize Arabic text for search matching
         function normalizeArabic(text) {
             if (!text) return '';
-            // Remove tashkeel
             text = text.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g, '');
-            // Normalize hamza
             text = text.replace(/[إأآا]/g, 'ا');
             text = text.replace(/[ؤ]/g, 'و');
             text = text.replace(/[ئ]/g, 'ي');
-            // Normalize taa marbuta
             text = text.replace(/ة/g, 'ه');
-            // Normalize alef maqsura
             text = text.replace(/ى/g, 'ي');
-            // Clean whitespace
-            text = text.split(/\s+/).join(' ').trim();
-            return text;
+            return text.split(/\s+/).join(' ').trim();
         }
 
         async function initApp() {
@@ -684,48 +681,43 @@
             const btnText = document.getElementById('btnText');
             
             btn.classList.add('loading');
-            btnText.innerHTML = '<span class="spinner"></span> جاري تحميل قاعدة البيانات... 0%';
+            btnText.innerHTML = '<span class="spinner"></span> جاري تهيئة البيانات... 0%';
 
             try {
-                // There are 7 JSON chunks
+                // Open Cache API for persistent zero-network loading
+                const cache = await caches.open('natega-cache-v1');
                 const chunkPromises = [];
+
                 for(let i = 0; i <= 6; i++) {
+                    const url = `json_data/data_${i}.json`;
                     chunkPromises.push(
-                        fetch(`json_data/data_${i}.json`).then(res => res.json())
+                        cache.match(url).then(async (cachedResponse) => {
+                            if (cachedResponse) {
+                                return cachedResponse.json();
+                            } else {
+                                const fetchResponse = await fetch(url);
+                                if(fetchResponse.ok) cache.put(url, fetchResponse.clone());
+                                return fetchResponse.json();
+                            }
+                        })
                     );
                 }
 
                 // Await all fetch requests (loads concurrently)
-                const chunks = await Promise.all(chunkPromises);
+                chunksData = await Promise.all(chunkPromises);
                 
-                // Process and combine
-                for (let i = 0; i < chunks.length; i++) {
-                    const dataArray = chunks[i];
-                    for (let j = 0; j < dataArray.length; j++) {
-                        const row = dataArray[j];
-                        const caseId = row[4];
-                        const caseDesc = caseMap[caseId] || '';
-
-                        // Update stats
+                // Calculate stats instantly without allocating objects
+                for (let i = 0; i < chunksData.length; i++) {
+                    const chunk = chunksData[i];
+                    for (let j = 0; j < chunk.length; j++) {
+                        const caseId = chunk[j][4];
                         stats.total_students++;
                         if (caseId === 1) stats.passed++;
                         else if (caseId === 2) stats.second_round++;
                         else if (caseId === 3) stats.failed++;
                         else if (caseId === 4) stats.absent++;
-
-                        // Add to main array
-                        studentsData.push({
-                            s: String(row[0]),
-                            n: row[1],
-                            nn: row[2],
-                            t: row[3],
-                            c: caseDesc,
-                            p: row[5],
-                            r: row[6],
-                            tp: row[7]
-                        });
                     }
-                    const percent = Math.round(((i + 1) / chunks.length) * 100);
+                    const percent = Math.round(((i + 1) / chunksData.length) * 100);
                     btnText.innerHTML = `<span class="spinner"></span> جاري تهيئة البيانات... ${percent}%`;
                 }
 
@@ -770,12 +762,12 @@
                 try {
                     const isDigits = /^\d+$/.test(query);
                     let results = [];
+                    let foundDigit = false;
 
-                    if (isDigits) {
-                        // Search by seat number
-                        const match = studentsData.find(s => s.s === query);
-                        if (match) results = [match];
-                    } else {
+                    let searchPhrase = '';
+                    let searchNoSpace = '';
+
+                    if (!isDigits) {
                         // Search by name
                         const normalized = normalizeArabic(query);
                         const parts = normalized.split(' ').filter(p => p.length > 0);
@@ -787,25 +779,41 @@
                             return;
                         }
 
-                        const searchPhrase = parts.join(' ');
-                        const searchNoSpace = parts.join('');
+                        searchPhrase = parts.join(' ');
+                        searchNoSpace = parts.join('');
+                    }
 
-                        results = studentsData.filter(s => {
-                            if (!s.nn) return false;
-                            return s.nn.startsWith(searchPhrase) || s.nn.replace(/ /g, '').startsWith(searchNoSpace);
-                        });
+                    // Ultra-fast search over 2D array chunks
+                    for (let i = 0; i < chunksData.length; i++) {
+                        if (foundDigit) break;
+                        const chunk = chunksData[i];
+                        for (let j = 0; j < chunk.length; j++) {
+                            const row = chunk[j];
+                            if (isDigits) {
+                                if (String(row[0]) === query) {
+                                    results.push(row);
+                                    foundDigit = true;
+                                    break;
+                                }
+                            } else {
+                                const nn = row[2];
+                                if (nn && (nn.startsWith(searchPhrase) || nn.replace(/ /g, '').startsWith(searchNoSpace))) {
+                                    results.push(row);
+                                }
+                            }
+                        }
                     }
 
                     const totalFound = results.length;
                     // Limit to top 50 results
                     const limitedResults = results.slice(0, 50).map(r => ({
-                        seating_no: r.s,
-                        name: r.n,
-                        total: r.t,
-                        percentage: r.p,
-                        status: r.c,
-                        rank: r.r,
-                        top_percent: r.tp,
+                        seating_no: r[0],
+                        name: r[1],
+                        total: r[3],
+                        status: caseMap[r[4]] || '',
+                        percentage: r[5],
+                        rank: r[6],
+                        top_percent: r[7],
                         total_students: stats.total_students
                     }));
 
@@ -816,12 +824,13 @@
                     }
 
                 } catch (e) {
+                    console.error(e);
                     showMessage('❌', 'حدث خطأ في البحث.', 'error');
                 } finally {
                     btn.classList.remove('loading');
                     btnText.textContent = 'بحث عن النتيجة';
                 }
-            }, 50);
+            }, 10);
         }
 
         function showMessage(icon, text, type) {
