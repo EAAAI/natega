@@ -1,8 +1,30 @@
+        const staticStats = {
+            '2026': {
+                total_students: 919396,
+                passed: 650909,
+                second_round: 210511,
+                failed: 53525,
+                absent: 4451,
+                total_score_sum: 182864892.5,
+                distributionBins: [182496, 200563, 201734, 170050, 121664, 32562, 10327]
+            },
+            '2025': {
+                total_students: 807385,
+                passed: 685849,
+                second_round: 0,
+                failed: 121536,
+                absent: 0,
+                total_score_sum: 169832016.5,
+                distributionBins: [121536, 135213, 188224, 166925, 140065, 47964, 7458]
+            }
+        };
 
         // Data variables
         let currentYear = '2026';
         let chunksData = []; // Array of chunks (arrays of arrays)
         let isDataLoaded = false;
+        let isDataLoading = false;
+        let pendingSearch = null;
         let distributionBins = [0, 0, 0, 0, 0, 0, 0]; // <50, 50-60, 60-70, 70-80, 80-90, 90-95, >95
         let tansikData = null; // Will hold Tansik expected data
 
@@ -76,122 +98,148 @@
 
         async function loadDataForYear(year) {
             isDataLoaded = false;
+            isDataLoading = true;
             chunksData = [];
-            distributionBins = [0, 0, 0, 0, 0, 0, 0];
-            stats = { total_students: 0, passed: 0, second_round: 0, failed: 0, absent: 0 };
+            pendingSearch = null;
             document.getElementById('resultsSection').classList.remove('visible');
             
-            // Update stats UI to empty
-            document.getElementById('statTotal').textContent = '---';
-            document.getElementById('statPassed').textContent = '---';
-            document.getElementById('statSecond').textContent = '---';
-            document.getElementById('statFailed').textContent = '---';
-
-            const btn = document.getElementById('searchBtn');
-            const btnText = document.getElementById('btnText');
-            btn.classList.add('loading');
-            btnText.innerHTML = '<span class="spinner"></span> جاري تهيئة البيانات... 0%';
-
-            try {
-                const cache = await caches.open('natega-cache-v3'); // changed cache version to bust old ones
-                const chunkPromises = [];
-                const basePath = year === '2026' ? 'json_data' : 'json_data_2025';
-                const maxChunks = year === '2026' ? 6 : 9; // 7 chunks for 2026, 10 for 2025
-
-                for (let i = 0; i <= maxChunks; i++) {
-                    const url = `${basePath}/data_${i}.json`;
-                    chunkPromises.push(
-                        cache.match(url).then(async (cachedResponse) => {
-                            if (cachedResponse) {
-                                return cachedResponse.json();
-                            } else {
-                                const fetchResponse = await fetch(url);
-                                if (fetchResponse.ok) cache.put(url, fetchResponse.clone());
-                                return fetchResponse.json();
-                            }
-                        })
-                    );
-                }
-
-                chunksData = await Promise.all(chunkPromises);
-
-                for (let i = 0; i < chunksData.length; i++) {
-                    const chunk = chunksData[i];
-                    for (let j = 0; j < chunk.length; j++) {
-                        const caseId = chunk[j][4];
-                        const percentage = chunk[j][5];
-                        stats.total_students++;
-                        if (caseId === 1) stats.passed++;
-                        else if (caseId === 2) stats.second_round++;
-                        else if (caseId === 3) stats.failed++;
-                        else if (caseId === 4) stats.absent++;
-
-                        if (percentage >= 95) distributionBins[6]++;
-                        else if (percentage >= 90) distributionBins[5]++;
-                        else if (percentage >= 80) distributionBins[4]++;
-                        else if (percentage >= 70) distributionBins[3]++;
-                        else if (percentage >= 60) distributionBins[2]++;
-                        else if (percentage >= 50) distributionBins[1]++;
-                        else distributionBins[0]++;
-                    }
-                    const percent = Math.round(((i + 1) / chunksData.length) * 100);
-                    btnText.innerHTML = `<span class="spinner"></span> جاري تهيئة البيانات... ${percent}%`;
-                }
-
-                isDataLoaded = true;
-                btn.classList.remove('loading');
-                btnText.textContent = 'بحث عن النتيجة';
-
+            // Instantly update stats UI from hardcoded data
+            const st = staticStats[year];
+            if (st) {
+                stats = { ...st, absent: 0 };
+                distributionBins = [...st.distributionBins];
                 document.getElementById('statTotal').textContent = formatNumber(stats.total_students);
                 document.getElementById('statPassed').textContent = formatNumber(stats.passed);
                 document.getElementById('statSecond').textContent = formatNumber(stats.second_round);
                 document.getElementById('statFailed').textContent = formatNumber(stats.failed);
+            }
+
+            const btn = document.getElementById('searchBtn');
+            const btnText = document.getElementById('btnText');
+            // Do not disable search button anymore, let the user search while loading!
+            btnText.innerHTML = '<span class="spinner"></span> جاري التحضير في الخلفية... 0%';
+
+            try {
+                const cache = await caches.open('natega-cache-v6'); 
+                const basePath = year === '2026' ? 'json_data' : 'json_data_2025';
+                const maxChunks = year === '2026' ? 6 : 9; 
+
+                // Middle-Out Loading Order
+                const loadOrder = [];
+                const mid = Math.floor(maxChunks / 2);
+                loadOrder.push(mid);
+                let left = mid - 1;
+                let right = mid + 1;
+                while (left >= 0 || right <= maxChunks) {
+                    if (left >= 0) loadOrder.push(left--);
+                    if (right <= maxChunks) loadOrder.push(right++);
+                }
+
+                for (let i = 0; i < loadOrder.length; i++) {
+                    if (currentYear !== year) return; // aborted by year change
+
+                    const chunkIndex = loadOrder[i];
+                    const url = `${basePath}/data_${chunkIndex}.json`;
+                    let chunk;
+                    
+                    const cachedResponse = await cache.match(url);
+                    if (cachedResponse) {
+                        chunk = await cachedResponse.json();
+                    } else {
+                        const fetchResponse = await fetch(url);
+                        if (fetchResponse.ok) cache.put(url, fetchResponse.clone());
+                        chunk = await fetchResponse.json();
+                    }
+
+                    chunksData.push(chunk);
+
+                    const percent = Math.round(((i + 1) / loadOrder.length) * 100);
+                    btnText.innerHTML = `<span class="spinner"></span> جاهز بنسبة ${percent}%`;
+                    
+                    // Yield back to the browser to render UI and prevent freezing
+                    await new Promise(resolve => setTimeout(resolve, 15));
+
+                    // Check if user made a pending search while we were fetching
+                    if (pendingSearch) {
+                        performSearch(false, true);
+                    }
+                }
+
+                isDataLoaded = true;
+                isDataLoading = false;
+                btn.classList.remove('loading');
+                btnText.textContent = 'بحث عن النتيجة';
+                
+                // Background Sync: Preload the other year slowly so it's instant next time!
+                preloadOtherYear(year === '2026' ? '2025' : '2026');
 
             } catch (e) {
                 console.error('Failed to load data:', e);
                 btnText.textContent = '❌ حدث خطأ في التحميل';
+                isDataLoading = false;
             }
         }
 
+        async function preloadOtherYear(otherYear) {
+            try {
+                const cache = await caches.open('natega-cache-v6');
+                const basePath = otherYear === '2026' ? 'json_data' : 'json_data_2025';
+                const maxChunks = otherYear === '2026' ? 6 : 9; 
+                for (let i = 0; i <= maxChunks; i++) {
+                    const url = `${basePath}/data_${i}.json`;
+                    const cached = await cache.match(url);
+                    if (!cached) {
+                        const res = await fetch(url);
+                        if (res.ok) cache.put(url, res.clone());
+                        await new Promise(r => setTimeout(r, 500)); // slow fetch in bg
+                    }
+                }
+            } catch(e) {}
+        }
 
-        // Autocomplete Logic
+
+        // Autocomplete Logic with Debounce
         const searchInputEl = document.getElementById('searchInput');
         const autocompleteList = document.getElementById('autocompleteList');
+        let autocompleteTimer = null;
 
         searchInputEl.addEventListener('input', function () {
+            clearTimeout(autocompleteTimer);
             const query = this.value.trim();
-            if (!query || /^\d+$/.test(query) || !isDataLoaded) {
+            if (!query || /^\d+$/.test(query) || chunksData.length === 0) {
                 autocompleteList.style.display = 'none';
                 return;
             }
 
-            const normalized = normalizeArabic(query);
-            const searchNoSpace = normalized.replace(/ /g, '');
-            let matches = [];
+            autocompleteTimer = setTimeout(() => {
+                const normalized = normalizeArabic(query);
+                const searchNoSpace = normalized.replace(/ /g, '');
+                let matches = [];
 
-            for (let i = 0; i < chunksData.length; i++) {
-                if (matches.length >= 5) break;
-                const chunk = chunksData[i];
-                for (let j = 0; j < chunk.length; j++) {
-                    const row = chunk[j];
-                    const nn = row[2];
-                    if (nn && (nn.startsWith(normalized) || nn.replace(/ /g, '').startsWith(searchNoSpace))) {
-                        matches.push(row);
-                        if (matches.length >= 5) break;
+                for (let i = 0; i < chunksData.length; i++) {
+                    if (matches.length >= 5) break;
+                    const chunk = chunksData[i];
+                    for (let j = 0; j < chunk.length; j++) {
+                        const row = chunk[j];
+                        const nn = row[2];
+                        if (nn && (nn.startsWith(normalized) || nn.replace(/ /g, '').startsWith(searchNoSpace))) {
+                            matches.push(row);
+                            if (matches.length >= 5) break;
+                        }
                     }
                 }
-            }
 
-            if (matches.length > 0) {
-                autocompleteList.innerHTML = matches.map(r =>
-                    `<div class="autocomplete-item" onclick="selectAutocomplete('${r[0]}', '${r[1]}')">
-                        ${r[1]} <span style="color:var(--text-muted); font-size:0.8rem;">(${r[0]})</span>
-                    </div>`
-                ).join('');
-                autocompleteList.style.display = 'block';
-            } else {
-                autocompleteList.style.display = 'none';
-            }
+                if (matches.length > 0) {
+                    autocompleteList.innerHTML = matches.map(r =>
+                        `<div class="autocomplete-item" onclick="selectAutocomplete('${r[0]}', '${r[1]}')">
+                            ${r[1]} <span style="color:var(--text-muted); font-size:0.8rem;">(${r[0]})</span>
+                        </div>`
+                    ).join('');
+                    autocompleteList.style.display = 'block';
+                } else {
+                    autocompleteList.style.display = 'none';
+                }
+            }, 300);
         });
 
         document.addEventListener('click', function (e) {
@@ -211,19 +259,19 @@
             if (e.key === 'Enter') performSearch();
         });
 
-        function performSearch(isNav = false) {
-            if (!isDataLoaded) {
+        function performSearch(isNav = false, isRetry = false) {
+            if (chunksData.length === 0 && !isDataLoading) {
                 showMessage('⚠️', 'يرجى الانتظار حتى يكتمل تحميل قاعدة البيانات.', 'error');
                 return;
             }
 
-            const query = document.getElementById('searchInput').value.trim();
+            const query = (isRetry && pendingSearch) ? pendingSearch : document.getElementById('searchInput').value.trim();
             if (!query) return;
 
             const btn = document.getElementById('searchBtn');
             const btnText = document.getElementById('btnText');
 
-            if (!isNav) {
+            if (!isNav && !isRetry) {
                 btn.classList.add('loading');
                 btnText.innerHTML = '<span class="spinner"></span> جاري البحث...';
             }
@@ -244,7 +292,7 @@
                         const parts = normalized.split(' ').filter(p => p.length > 0);
 
                         if (parts.length < 2) {
-                            showMessage('⚠️', 'يرجى إدخال اسمين على الأقل', 'error');
+                            if (!isRetry) showMessage('⚠️', 'يرجى إدخال اسمين على الأقل', 'error');
                             btn.classList.remove('loading');
                             btnText.textContent = 'بحث عن النتيجة';
                             return;
@@ -289,21 +337,29 @@
                     }));
 
                     if (limitedResults.length === 0) {
-                        showMessage('😕', 'لم يتم العثور على نتائج. تأكد من صحة البيانات المُدخلة.', '');
+                        if (isDataLoading) {
+                            pendingSearch = query; // save for next chunk
+                            if (!isRetry) {
+                                showMessage('⏳', 'لم أجد الرقم في الملفات الحالية.. جاري فحص باقي الملفات بمجرد اكتمال تحميلها فوراً في الخلفية...', 'info');
+                            }
+                        } else {
+                            pendingSearch = null;
+                            showMessage('😕', 'لم يتم العثور على نتائج. تأكد من صحة البيانات المُدخلة.', '');
+                            btn.classList.remove('loading');
+                            if(isDataLoaded) btnText.textContent = 'بحث عن النتيجة';
+                        }
                     } else {
+                        pendingSearch = null;
                         displayResults(limitedResults, totalFound, isNav);
+                        btn.classList.remove('loading');
+                        if(isDataLoaded) btnText.textContent = 'بحث عن النتيجة';
                     }
 
                 } catch (e) {
                     console.error(e);
                     showMessage('❌', 'حدث خطأ في البحث.', 'error');
-                } finally {
-                    if (!isNav) {
-                        btn.classList.remove('loading');
-                        btnText.textContent = 'بحث عن النتيجة';
-                    }
                 }
-            }, 10);
+            }, 5);
         }
 
         function showMessage(icon, text, type) {
@@ -449,6 +505,10 @@
                     <div class="percentage-bar" style="margin-bottom: 20px;">
                         <div class="fill" style="width: ${Math.min(r.percentage, 100)}%"></div>
                     </div>
+                    
+                    <div id="sameScoreStat-${r.seating_no}" style="margin-bottom: 16px; padding: 10px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; color: var(--primary-light); font-size: 0.95rem;">
+                        <span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span> جاري حساب تكرار المجموع...
+                    </div>
 
                     <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap;">
                         <button class="nav-btn" onclick="navigateModal('${parseInt(r.seating_no) - 1}')">⬆️ اللي قبله</button>
@@ -505,6 +565,23 @@
             if (r.percentage >= 90) {
                 // Happy sound placeholder
             }
+
+            // Calculate frequency of the same score asynchronously to avoid blocking UI
+            setTimeout(() => {
+                let sameScoreCount = 0;
+                for (let i = 0; i < chunksData.length; i++) {
+                    const chunk = chunksData[i];
+                    for (let j = 0; j < chunk.length; j++) {
+                        if (chunk[j][3] === r.total) {
+                            sameScoreCount++;
+                        }
+                    }
+                }
+                const statEl = document.getElementById(`sameScoreStat-${r.seating_no}`);
+                if (statEl) {
+                    statEl.innerHTML = `📊 هذا المجموع (${r.total}) تكرر مع <strong>${formatNumber(sameScoreCount)}</strong> طالب على مستوى الجمهورية.`;
+                }
+            }, 50);
         }
 
 
@@ -559,7 +636,14 @@
 
             closeModal();
             let label = dir === 'both' ? 'قبله وبعده' : (dir === 'before' ? 'قبله' : 'بعده');
-            displayResults(formatted, formatted.length, false, false, `🏫 طلاب اللجنة (${label}) — عرض <span>${results.length}</span> طالب`);
+
+            // Calculate Average for this block
+            let sumTotal = 0;
+            results.forEach(r => sumTotal += r[3]);
+            let blockAvg = results.length > 0 ? (sumTotal / results.length).toFixed(2) : 0;
+            let blockAvgPercentage = results.length > 0 ? ((sumTotal / results.length) / 3.2).toFixed(2) : 0;
+
+            displayResults(formatted, formatted.length, false, false, `🏫 طلاب اللجنة (${label}) — عرض <span>${results.length}</span> طالب <br><span style="font-size: 0.95rem; color: var(--accent); display: block; margin-top: 8px;">متوسط درجات هؤلاء الطلاب: <strong>${blockAvg}</strong> بنسبة <strong>${blockAvgPercentage}%</strong></span>`);
         }
 
         function closeModal() {
@@ -777,6 +861,94 @@
 
         let compareChartsInitialized = false;
         function renderCompareCharts() {
+            // Update Averages
+            let avgStatsHtml = '';
+            if (isDataLoaded) {
+                const avgScore = (stats.total_score_sum / stats.total_students).toFixed(2);
+                const avgPercentage = ((stats.total_score_sum / stats.total_students) / 3.2).toFixed(2);
+                avgStatsHtml = `
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; min-width: 200px;">
+                        <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">متوسط نتائج دفعة ${currentYear}</div>
+                        <div style="color: var(--primary-light); font-size: 1.5rem; font-weight: bold;">${avgScore} <span style="font-size: 1rem; color: var(--text-secondary);">(${avgPercentage}%)</span></div>
+                    </div>
+                `;
+            }
+            // Just hardcode previous year average for comparison appearance
+            const prevYear = currentYear === '2026' ? '2025' : '2024';
+            let prevAvgScore, prevAvgPercentage;
+            if (currentYear === '2026') {
+                prevAvgScore = (staticStats['2025'].total_score_sum / staticStats['2025'].total_students).toFixed(2);
+                prevAvgPercentage = ((staticStats['2025'].total_score_sum / staticStats['2025'].total_students) / 3.2).toFixed(2);
+            } else {
+                prevAvgScore = '204.30'; 
+                prevAvgPercentage = '63.84';
+            }
+            avgStatsHtml += `
+                <div style="background: var(--bg-input); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; min-width: 200px; opacity: 0.8;">
+                    <div style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 4px;">متوسط نتائج دفعة ${prevYear}</div>
+                    <div style="color: var(--text-primary); font-size: 1.5rem; font-weight: bold;">${prevAvgScore} <span style="font-size: 1rem; color: var(--text-secondary);">(${prevAvgPercentage}%)</span></div>
+                </div>
+            `;
+            
+            const avgContainer = document.getElementById('averageCompareStats');
+            if(avgContainer) {
+                avgContainer.innerHTML = avgStatsHtml;
+            }
+
+            // Clear previous 30-student analysis if any
+            const analyze30Results = document.getElementById('analyze30Results');
+            if (analyze30Results) {
+                analyze30Results.style.display = 'none';
+                analyze30Results.innerHTML = '';
+            }
+
+            const labels = ['أقل من 50%', '50-60%', '60-70%', '70-80%', '80-90%', '90-95%', 'أعلى من 95%'];
+
+            // Build numeric distribution table
+            if (isDataLoaded) {
+                let distTableHtml = '<h4 style="margin-bottom: 16px; color: var(--primary-light); font-size: 1.2rem;">📊 التوزيع العددي لشرائح المجاميع مقارنة بـ ' + prevYear + '</h4>';
+                distTableHtml += '<div style="overflow-x: auto;"><table style="width: 100%; text-align: center; border-collapse: collapse; font-size: 0.95rem; background: var(--bg-card); border-radius: 12px; overflow: hidden;">';
+                distTableHtml += `<tr style="border-bottom: 1px solid var(--border); background: var(--bg-input); color: var(--text-secondary);"> 
+                    <th style="padding: 12px;">الشريحة</th> 
+                    <th style="padding: 12px; color: var(--primary-light);">عدد الطلاب (${currentYear})</th> 
+                    <th style="padding: 12px;">النسبة</th> 
+                    <th style="padding: 12px; border-right: 1px solid var(--border); color: var(--text-muted);">عدد الطلاب (${prevYear})</th> 
+                    <th style="padding: 12px; color: var(--text-muted);">النسبة</th> 
+                </tr>`;
+                
+                const currentTotal = stats.total_students || 1;
+                
+                let prevBins, prevTotal;
+                if (currentYear === '2026') {
+                    prevBins = staticStats['2025'].distributionBins;
+                    prevTotal = staticStats['2025'].total_students;
+                } else {
+                    prevBins = [0, 0, 0, 0, 0, 0, 0]; // placeholder for 2024
+                    prevTotal = 1;
+                }
+                
+                for (let i = labels.length - 1; i >= 0; i--) { // Reverse to show highest score first
+                    const count1 = distributionBins[i];
+                    const pct1 = ((count1 / currentTotal) * 100).toFixed(2);
+                    
+                    const count2 = prevBins[i];
+                    const pct2 = prevTotal > 1 ? ((count2 / prevTotal) * 100).toFixed(2) : '-';
+                    const displayCount2 = prevTotal > 1 ? formatNumber(count2) : '-';
+                    
+                    distTableHtml += `<tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 12px; font-weight: bold;">${labels[i]}</td>
+                        <td style="padding: 12px; color: var(--accent); font-weight: bold;">${formatNumber(count1)}</td>
+                        <td style="padding: 12px; color: var(--success);">${pct1}%</td>
+                        <td style="padding: 12px; border-right: 1px solid var(--border); color: var(--text-secondary);">${displayCount2}</td>
+                        <td style="padding: 12px; color: var(--text-muted);">${pct2 === '-' ? '-' : pct2 + '%'}</td>
+                    </tr>`;
+                }
+                distTableHtml += '</table></div>';
+                
+                const distContainer = document.getElementById('distributionTableContainer');
+                if (distContainer) distContainer.innerHTML = distTableHtml;
+            }
+
             if (compareChartsInitialized) {
                 if (window.compareChartInstance) window.compareChartInstance.destroy();
                 if (window.successChartInstance) window.successChartInstance.destroy();
@@ -786,8 +958,6 @@
             const ctxCompare = document.getElementById('compareChart').getContext('2d');
             const ctxSuccess = document.getElementById('successRateChart').getContext('2d');
 
-            const labels = ['أقل من 50%', '50-60%', '60-70%', '70-80%', '80-90%', '90-95%', 'أعلى من 95%'];
-            
             // For comparing, we always compare 2025 vs 2026
             const data2025 = [327631, 234645, 185705, 59971, 2370, 574, 84];
             
@@ -1019,6 +1189,42 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
+        }
+
+        async function shareCard(seatNo) {
+            const card = document.getElementById('card-' + seatNo);
+            if (!card || typeof html2canvas === 'undefined') {
+                alert('جاري تحميل المكاتب اللازمة، يرجى المحاولة بعد قليل.');
+                return;
+            }
+            const buttons = card.querySelectorAll('button');
+            buttons.forEach(b => b.style.display = 'none');
+
+            try {
+                const canvas = await html2canvas(card, { backgroundColor: '#0f0f23' });
+                buttons.forEach(b => b.style.display = '');
+                canvas.toBlob(async (blob) => {
+                    if (navigator.share && navigator.canShare) {
+                        const file = new File([blob], `natega_${seatNo}.png`, { type: 'image/png' });
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                title: 'نتيجة الثانوية العامة',
+                                text: 'شوف نتيجتي في الثانوية العامة! 🎓',
+                                files: [file]
+                            });
+                            return;
+                        }
+                    }
+                    // Fallback: download
+                    const link = document.createElement('a');
+                    link.download = `natega_${seatNo}.png`;
+                    link.href = URL.createObjectURL(blob);
+                    link.click();
+                }, 'image/png');
+            } catch(e) {
+                buttons.forEach(b => b.style.display = '');
+                downloadCard(seatNo);
+            }
         }
 
         function showTopStudents() {
