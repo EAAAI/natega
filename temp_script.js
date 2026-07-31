@@ -96,8 +96,9 @@
                 const cache = await caches.open('natega-cache-v3'); // changed cache version to bust old ones
                 const chunkPromises = [];
                 const basePath = year === '2026' ? 'json_data' : 'json_data_2025';
+                const maxChunks = year === '2026' ? 6 : 9; // 7 chunks for 2026, 10 for 2025
 
-                for (let i = 0; i <= 6; i++) {
+                for (let i = 0; i <= maxChunks; i++) {
                     const url = `${basePath}/data_${i}.json`;
                     chunkPromises.push(
                         cache.match(url).then(async (cachedResponse) => {

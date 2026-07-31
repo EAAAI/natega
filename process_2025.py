@@ -64,8 +64,8 @@ records.sort(key=lambda x: int(x[0]) if x[0].isdigit() else 0)
 out_dir = 'json_data_2025'
 os.makedirs(out_dir, exist_ok=True)
 
-# Split into 7 chunks (0 to 6)
-num_chunks = 7
+# Split into 10 chunks (0 to 9)
+num_chunks = 10
 chunk_size = math.ceil(len(records) / num_chunks)
 
 for i in range(num_chunks):
